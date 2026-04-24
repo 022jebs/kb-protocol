@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KB Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#141414;--card:#1c1c1c;--border:#2a2a2a;--accent:#e8ff47;--accent2:#47ffd4;--accent3:#ff6b47;--muted:#555;--text:#e8e8e8;--text2:#999}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column}
+nav{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)}
+.nav-btn{flex:1;padding:14px 8px;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.nav-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.nav-btn:hover:not(.active){color:var(--text2)}
+main{flex:1;overflow-y:auto;overflow-x:hidden}
+.screen{display:none;padding:20px;max-width:600px;margin:0 auto}
+.screen.active{display:block}
+.screen-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;color:var(--accent);line-height:1;margin-bottom:4px}
+.screen-sub{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:24px}
+.badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-family:'DM Mono',monospace;font-weight:500;letter-spacing:1px}
+.badge-L{background:rgba(71,255,212,.12);color:var(--accent2);border:1px solid rgba(71,255,212,.25)}
+.badge-H{background:rgba(255,107,71,.12);color:var(--accent3);border:1px solid rgba(255,107,71,.25)}
+
+/* PROGRESSION BANNER */
+.prog-banner{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
+.prog-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.prog-step-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.prog-step-val{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--accent);line-height:1}
+.prog-weights{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:5px;line-height:1.6}
+.prog-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.prog-btn{padding:7px 14px;background:none;border:1px solid var(--border);color:var(--text2);border-radius:6px;font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:all .2s;letter-spacing:1px;white-space:nowrap}
+.prog-btn.up{border-color:var(--accent);color:var(--accent)}
+.prog-btn:hover{border-color:var(--text)}
+.prog-btn.up:hover{background:var(--accent);color:#000}
+.prog-bar-wrap{background:var(--surface);border-radius:4px;height:4px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:4px;transition:width .4s}
+.prog-bar-label{display:flex;justify-content:space-between;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);margin-top:5px}
+
+/* DAY CARDS */
+.day-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.day-card:hover{border-color:var(--muted)}
+.day-card.today{border-color:var(--accent)}
+.day-header{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.day-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;width:36px;flex-shrink:0}
+.day-type{flex:1}
+.day-type-label{font-size:13px;font-weight:600;margin-bottom:4px}
+.day-exercises{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;line-height:1.7}
+.day-chevron{color:var(--muted);font-size:18px;transition:transform .2s;flex-shrink:0}
+.day-card.open .day-chevron{transform:rotate(180deg)}
+.day-detail{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.day-detail.open{display:block}
+.ex-row{display:flex;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border)}
+.ex-row:last-child{border-bottom:none}
+.ex-name{font-size:13px;font-weight:600;margin-bottom:3px}
+.ex-detail{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;line-height:1.6}
+.ex-note{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic;line-height:1.4}
+.start-btn{width:100%;margin-top:14px;padding:13px;background:var(--accent);color:#000;border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;transition:opacity .2s}
+.start-btn:hover{opacity:.85}
+
+/* TIMER */
+.timer-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0}
+.timer-ex-info{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;width:100%;margin-bottom:16px}
+.timer-ex-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--accent);margin-bottom:4px}
+.timer-ex-sub{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace}
+.timer-phase{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
+.timer-phase.work{color:var(--accent)}
+.timer-phase.rest{color:var(--accent2)}
+.timer-phase.ready{color:var(--muted)}
+.timer-phase.done{color:var(--accent2)}
+.timer-circle{position:relative;width:200px;height:200px;margin-bottom:20px}
+.timer-svg{transform:rotate(-90deg)}
+.timer-track{fill:none;stroke:var(--border);stroke-width:8}
+.timer-prog{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .9s linear,stroke .3s}
+.timer-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.timer-time{font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:2px;line-height:1}
+.timer-round{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px}
+.timer-controls{display:flex;gap:10px;margin-bottom:20px}
+.t-btn{padding:10px 22px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;transition:all .2s}
+.t-btn.primary{background:var(--accent);color:#000;border-color:var(--accent)}
+.t-btn:hover:not(.primary){border-color:var(--text2)}
+.t-btn.primary:hover{opacity:.85}
+.timer-settings{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;width:100%}
+.settings-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.setting-row:last-child{margin-bottom:0}
+.setting-label{font-size:13px;font-weight:500}
+.setting-controls{display:flex;align-items:center;gap:8px}
+.s-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s}
+.s-btn:hover{border-color:var(--accent)}
+.s-val{font-family:'DM Mono',monospace;font-size:14px;width:50px;text-align:center;color:var(--accent)}
+
+/* CALENDAR */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-month{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--accent)}
+.cal-nav{background:none;border:1px solid var(--border);color:var(--text);border-radius:6px;width:32px;height:32px;cursor:pointer;font-size:16px;transition:border-color .2s}
+.cal-nav:hover{border-color:var(--accent)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px}
+.cal-dow{text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:4px 0;letter-spacing:1px}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;border:1px solid transparent;transition:all .15s;gap:2px}
+.cal-day.other{color:var(--border);pointer-events:none}
+.cal-day.today{border-color:var(--accent);color:var(--accent)}
+.cal-day.done{background:rgba(71,255,212,.1);border-color:rgba(71,255,212,.3);color:var(--accent2)}
+.cal-day.skipped{background:rgba(255,107,71,.08);border-color:rgba(255,107,71,.2);color:var(--accent3)}
+.cal-day:not(.other):hover{border-color:var(--muted)}
+.cal-dot{width:4px;height:4px;border-radius:50%}
+.cal-day.done .cal-dot{background:var(--accent2)}
+.cal-day.skipped .cal-dot{background:var(--accent3)}
+.cal-day.train:not(.done):not(.skipped) .cal-dot{background:var(--border)}
+.cal-legend{display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.cal-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.cal-legend-dot{width:8px;height:8px;border-radius:50%}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);letter-spacing:2px}
+.stat-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.history-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.history-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:68px;flex-shrink:0}
+.history-info{flex:1}
+.history-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.history-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.history-status{font-size:11px;font-family:'DM Mono',monospace;font-weight:600}
+.status-done{color:var(--accent2)}
+.status-skip{color:var(--accent3)}
+.empty-state{text-align:center;padding:40px 0;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;line-height:2.2}
+
+/* MODALS */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;padding:24px 20px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;position:relative}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:20px}
+.modal-btn{width:100%;padding:13px;border-radius:8px;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;cursor:pointer;margin-bottom:8px;transition:opacity .2s}
+.modal-btn:hover{opacity:.85}
+.modal-btn.primary{background:var(--accent2);color:#000}
+.modal-btn.secondary{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.modal-btn.danger{background:var(--accent3);color:#fff}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}
+
+/* STEP LIST */
+.step-list{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.step-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:all .2s}
+.step-item:hover{border-color:var(--text2)}
+.step-item.active{border-color:var(--accent);background:rgba(232,255,71,.04)}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);width:26px;flex-shrink:0;text-align:center}
+.step-item.active .step-num{color:var(--accent)}
+.step-info{flex:1}
+.step-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.step-detail{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.step-sep{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:8px 4px 4px;border-top:1px solid var(--border);margin-top:4px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="nav-btn active" onclick="showScreen('plan')">PLAN</button>
+  <button class="nav-btn" onclick="showScreen('timer')">TIMER</button>
+  <button class="nav-btn" onclick="showScreen('calendar')">KALENDARZ</button>
+</nav>
+
+<main>
+<div id="screen-plan" class="screen active"></div>
+
+<div id="screen-timer" class="screen">
+  <div class="screen-title">TIMER</div>
+  <div class="screen-sub">INTERWAŁOWY</div>
+  <div class="timer-wrap">
+    <div id="timer-ex-info" class="timer-ex-info" style="display:none">
+      <div id="timer-ex-name" class="timer-ex-name"></div>
+      <div id="timer-ex-sub" class="timer-ex-sub"></div>
+    </div>
+    <div class="timer-phase ready" id="timer-phase">GOTOWY</div>
+    <div class="timer-circle">
+      <svg class="timer-svg" viewBox="0 0 200 200" width="200" height="200">
+        <circle class="timer-track" cx="100" cy="100" r="88"/>
+        <circle class="timer-prog" id="timer-prog" cx="100" cy="100" r="88"
+          stroke-dasharray="553" stroke-dashoffset="0" stroke="var(--accent)"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-time" id="timer-display">60</div>
+        <div class="timer-round" id="timer-round-info">RUNDA 1</div>
+      </div>
+    </div>
+    <div class="timer-controls">
+      <button class="t-btn" onclick="resetTimer()">RESET</button>
+      <button class="t-btn primary" id="timer-toggle-btn" onclick="toggleTimer()">START</button>
+      <button class="t-btn" onclick="skipPhase()">SKIP</button>
+    </div>
+    <div class="timer-settings">
+      <div class="settings-title">Ustawienia timera</div>
+      <div class="setting-row">
+        <span class="setting-label">Praca</span>
+        <div class="setting-controls">
+          <button class="s-btn" onclick="adjustSetting('work',-5)">−</button>
+          <span class="s-val" id="work-val">60s</span>
+          <button class="s-btn" onclick="adjustSetting('work',5)">+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Odpoczynek</span>
+        <div class="setting-controls">
+          <button class="s-btn" onclick="adjustSetting('rest',-5)">−</button>
+          <span class="s-val" id="rest-val">30s</span>
+          <button class="s-btn" onclick="adjustSetting('rest',5)">+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Rundy</span>
+        <div class="setting-controls">
+          <button class="s-btn" onclick="adjustSetting('rounds',-1)">−</button>
+          <span class="s-val" id="rounds-val">4</span>
+          <button class="s-btn" onclick="adjustSetting('rounds',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-calendar" class="screen"></div>
+</main>
+
+<!-- MODAL: log session -->
+<div class="modal-bg" id="modal-log">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-log')">×</button>
+    <div class="modal-title" id="modal-log-title"></div>
+    <div class="modal-sub" id="modal-log-sub"></div>
+    <button class="modal-btn primary" onclick="logSession('done')">✓ WYKONANE</button>
+    <button class="modal-btn danger" onclick="logSession('skipped')">✗ POMINIĘTE</button>
+    <button class="modal-btn secondary" onclick="closeModal('modal-log')">ANULUJ</button>
+  </div>
+</div>
+
+<!-- MODAL: progression -->
+<div class="modal-bg" id="modal-prog">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-prog')">×</button>
+    <div class="modal-title">PROGRESJA</div>
+    <div class="modal-sub">WYBIERZ KROK PROGRAMU</div>
+    <div id="step-list" class="step-list"></div>
+    <button class="modal-btn secondary" onclick="closeModal('modal-prog')">ANULUJ</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// PROGRESSION STEPS
+// 12 steps: 3 weight stages × 4 volume levels
+// intRounds: rounds for interval exercises (60s/30s)
+// tguSets:   sets for TGU (1L+1P per set, 30s rest between)
+// ═══════════════════════════════════════════════════════════
+const STEPS = [
+  { step:1,  L:6,  H:8,  SL:8,  SH:12, intRounds:4,  tguSets:3, etap:1 },
+  { step:2,  L:6,  H:8,  SL:8,  SH:12, intRounds:6,  tguSets:3, etap:1 },
+  { step:3,  L:6,  H:8,  SL:8,  SH:12, intRounds:8,  tguSets:4, etap:1 },
+  { step:4,  L:6,  H:8,  SL:8,  SH:12, intRounds:10, tguSets:5, etap:1 },
+  { step:5,  L:8,  H:12, SL:12, SH:16, intRounds:4,  tguSets:3, etap:2 },
+  { step:6,  L:8,  H:12, SL:12, SH:16, intRounds:6,  tguSets:3, etap:2 },
+  { step:7,  L:8,  H:12, SL:12, SH:16, intRounds:8,  tguSets:4, etap:2 },
+  { step:8,  L:8,  H:12, SL:12, SH:16, intRounds:10, tguSets:5, etap:2 },
+  { step:9,  L:12, H:16, SL:16, SH:16, intRounds:4,  tguSets:3, etap:3 },
+  { step:10, L:12, H:16, SL:16, SH:16, intRounds:6,  tguSets:3, etap:3 },
+  { step:11, L:12, H:16, SL:16, SH:16, intRounds:8,  tguSets:4, etap:3 },
+  { step:12, L:12, H:16, SL:16, SH:16, intRounds:10, tguSets:5, etap:3 },
+];
+
+const WARMUPS = {
+  mon: { dur:13, links:[
+    { label:'Swing warmup', url:'https://www.youtube.com/watch?v=yRTIwttiPFo' },
+    { label:'TGU warmup',   url:'https://www.youtube.com/watch?v=xmLrg1kUvU0' },
+  ]},
+  tue: { dur:12, links:[
+    { label:'C&P warmup',   url:'https://www.youtube.com/watch?v=uodkIIcXtRk' },
+    { label:'Squat warmup', url:'https://www.youtube.com/watch?v=DodDS67fhLc' },
+  ]},
+  thu: { dur:13, links:[
+    { label:'Swing warmup', url:'https://www.youtube.com/watch?v=yRTIwttiPFo' },
+    { label:'TGU warmup',   url:'https://www.youtube.com/watch?v=xmLrg1kUvU0' },
+  ]},
+  fri: { dur:12, links:[
+    { label:'C&P warmup',   url:'https://www.youtube.com/watch?v=uodkIIcXtRk' },
+    { label:'Squat warmup', url:'https://www.youtube.com/watch?v=DodDS67fhLc' },
+  ]},
+};
+
+const COOLDOWNS = {
+  mon: { dur:13, links:[
+    { label:'Lower Body', url:'https://www.youtube.com/watch?v=tAd1q2PskVs' },
+    { label:'Upper Body', url:'https://www.youtube.com/watch?v=S5w1GDdQP5o' },
+  ]},
+  tue: { dur:19, links:[
+    { label:'Lower Body', url:'https://www.youtube.com/watch?v=hV9a2B4gD2A' },
+    { label:'Upper Body', url:'https://www.youtube.com/watch?v=OUlBO3g0OIY' },
+  ]},
+  thu: { dur:13, links:[
+    { label:'Lower Body', url:'https://www.youtube.com/watch?v=tAd1q2PskVs' },
+    { label:'Upper Body', url:'https://www.youtube.com/watch?v=OUlBO3g0OIY' },
+  ]},
+  fri: { dur:19, links:[
+    { label:'Lower Body', url:'https://www.youtube.com/watch?v=hV9a2B4gD2A' },
+    { label:'Upper Body', url:'https://www.youtube.com/watch?v=S5w1GDdQP5o' },
+  ]},
+};
+
+const WEEK = [
+  { key:'mon', name:'PN', type:'train', label:'Swing L + TGU H',
+    exercises:[
+      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min' },
+      { name:'Swing', fmt:'interval', w:'L', note:'Eksplozja bioder — nie ramion. Plecy neutralne przez cały ruch.' },
+      { name:'Turkish Get-Up', fmt:'tgu', w:'H', note:'Każda faza osobno i świadomie. Wzrok na kettlebell.' },
+      { name:'Cooldown', fmt:'fixed', detail:'5–10 min' },
+    ]},
+  { key:'tue', name:'WT', type:'train', label:'Clean & Press H + Squat L',
+    exercises:[
+      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min' },
+      { name:'Clean & Press', fmt:'interval', w:'H', note:'KB blisko ciała w cleanie — nie biceps curl. Naprzemiennie ręce co rundę.' },
+      { name:'Squat (Goblet)', fmt:'interval', w:'L', squat:true, note:'Pięty na ziemi, pełen zakres. Łokcie wciskają kolana na zewnątrz.' },
+      { name:'Cooldown', fmt:'fixed', detail:'5–10 min' },
+    ]},
+  { key:'wed', name:'ŚR', type:'rest', label:'ODPOCZYNEK' },
+  { key:'thu', name:'CZ', type:'train', label:'Swing H + TGU L',
+    exercises:[
+      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min' },
+      { name:'Swing', fmt:'interval', w:'H', note:'Cięższy kettlebell — mniej powt./rundę. Technika ponad wszystko.' },
+      { name:'Turkish Get-Up', fmt:'tgu', w:'L', note:'Lżejszy ciężar — pracuj nad płynnością przejść między fazami.' },
+      { name:'Cooldown', fmt:'fixed', detail:'5–10 min' },
+    ]},
+  { key:'fri', name:'PT', type:'train', label:'Clean & Press L + Squat H',
+    exercises:[
+      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min' },
+      { name:'Clean & Press', fmt:'interval', w:'L', note:'Lżejszy ciężar — więcej powt./rundę. Skup się na płynności cleana.' },
+      { name:'Squat (Goblet)', fmt:'interval', w:'H', squat:true, note:'Kontrola głębokości pod wyższym ciężarem.' },
+      { name:'Cooldown', fmt:'fixed', detail:'5–10 min' },
+    ]},
+  { key:'sat', name:'SB', type:'rest', label:'ODPOCZYNEK' },
+  { key:'sun', name:'ND', type:'rest', label:'ODPOCZYNEK' },
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+function loadState() {
+  try { return JSON.parse(localStorage.getItem('kb2_state')) || { step:1, sessions:{} }; }
+  catch { return { step:1, sessions:{} }; }
+}
+function saveState() { localStorage.setItem('kb2_state', JSON.stringify(state)); }
+
+let state = loadState();
+let pendingLogDate = null;
+let pendingLogDayKey = null;
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function curStep() { return STEPS[Math.min(state.step,STEPS.length)-1]; }
+function kg(w, isSquat) {
+  const s = curStep();
+  if (isSquat) return w==='L' ? s.SL : s.SH;
+  return w==='L' ? s.L : s.H;
+}
+function approxMin(rounds) { return Math.round(rounds*90/60); }
+
+// ═══════════════════════════════════════════════════════════
+// PLAN SCREEN
+// ═══════════════════════════════════════════════════════════
+function renderPlan() {
+  const s = curStep();
+  const todayKey = ['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
+  const pct = Math.round((state.step / STEPS.length) * 100);
+  const isLast = state.step >= STEPS.length;
+
+  let html = `
+    <div class="screen-title">KB PROTOCOL</div>
+    <div class="screen-sub">WILDMAN ATHLETICA METHOD</div>
+    <div class="prog-banner">
+      <div class="prog-top">
+        <div>
+          <div class="prog-step-label">Aktualny krok</div>
+          <div class="prog-step-val">ETAP ${s.etap} — KROK ${state.step}</div>
+          <div class="prog-weights">
+            L = ${s.L}kg &nbsp;·&nbsp; H = ${s.H}kg<br>
+            Interwały: ${s.intRounds} rund (~${approxMin(s.intRounds)} min)<br>
+            TGU: ${s.tguSets} serie × 1L+1P
+          </div>
+        </div>
+        <div class="prog-actions">
+          ${!isLast
+            ? `<button class="prog-btn up" onclick="nextStep()">↑ PROGRESJA</button>`
+            : `<span style="font-size:11px;color:var(--accent2);font-family:'DM Mono',monospace">SZCZYT ✓</span>`}
+          <button class="prog-btn" onclick="openProgModal()">ZMIEŃ KROK</button>
+        </div>
+      </div>
+      <div class="prog-bar-wrap"><div class="prog-bar" style="width:${pct}%"></div></div>
+      <div class="prog-bar-label"><span>KROK ${state.step} / ${STEPS.length}</span><span>${pct}%</span></div>
+    </div>`;
+
+  WEEK.forEach(day => {
+    const isToday = day.key === todayKey;
+    const todayCls = isToday ? ' today' : '';
+
+    if (day.type === 'rest') {
+      html += `<div class="day-card${todayCls}">
+        <div class="day-header">
+          <div class="day-name" style="color:var(--muted)">${day.name}</div>
+          <div class="day-type"><div class="day-type-label" style="color:var(--muted)">${day.label}</div></div>
+          ${isToday ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);flex-shrink:0"></div>' : ''}
+        </div>
+      </div>`;
+      return;
+    }
+
+    const mainExes = day.exercises.filter(e => e.w);
+    const exSummary = mainExes.map(e => {
+      const vol = e.fmt==='tgu' ? `${s.tguSets} ser.` : `${s.intRounds} rund`;
+      return `${e.name} <span class="badge badge-${e.w}">${e.w}·${kg(e.w,e.squat)}kg</span> ${vol}`;
+    }).join('<br>');
+
+    let exRows = '';
+    day.exercises.forEach(ex => {
+      let detail = '';
+      if (ex.fmt === 'fixed') {
+        const cd = COOLDOWNS[day.key];
+        const wu = WARMUPS[day.key];
+        if (ex.name === 'Cooldown' && cd) detail = `${cd.dur} min (lower + upper)`;
+        else if (ex.name === 'Rozgrzewka' && wu) detail = `${wu.dur} min`;
+        else detail = ex.detail;
+      } else if (ex.fmt === 'interval') {
+        detail = `${kg(ex.w,ex.squat)}kg (${ex.w})  ·  ${s.intRounds} rund  ·  60s / 30s  ·  ~${approxMin(s.intRounds)} min`;
+      } else if (ex.fmt === 'tgu') {
+        detail = `${kg(ex.w,ex.squat)}kg (${ex.w})  ·  ${s.tguSets} rundy  ·  1L+1P bez przerwy  ·  30s między rundami`;
+      }
+
+      // Warmup / Cooldown links
+      let cooldownLinks = '';
+      if (ex.name === 'Rozgrzewka' && WARMUPS[day.key]) {
+        const wu = WARMUPS[day.key];
+        cooldownLinks = '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">' +
+          wu.links.map(c =>
+            `<a href="${c.url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;color:var(--text2);text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">▶ ${c.label}</a>`
+          ).join('') + '</div>';
+      }
+      if (ex.name === 'Cooldown' && COOLDOWNS[day.key]) {
+        const cd = COOLDOWNS[day.key];
+        cooldownLinks = '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">' +
+          cd.links.map(c =>
+            `<a href="${c.url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;color:var(--text2);text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">▶ ${c.label}</a>`
+          ).join('') + '</div>';
+      }
+
+      exRows += `<div class="ex-row">
+        <div style="width:100%">
+          <div class="ex-name">${ex.name}${ex.w ? ` <span class="badge badge-${ex.w}">${ex.w}</span>` : ''}</div>
+          <div class="ex-detail">${detail}</div>
+          ${ex.note ? `<div class="ex-note">${ex.note}</div>` : ''}
+          ${cooldownLinks}
+        </div>
+      </div>`;
+    });
+
+    html += `<div class="day-card${todayCls}" id="card-${day.key}" onclick="toggleDay('${day.key}')">
+      <div class="day-header">
+        <div class="day-name">${day.name}</div>
+        <div class="day-type">
+          <div class="day-type-label">${day.label}</div>
+          <div class="day-exercises">${exSummary}</div>
+        </div>
+        <div class="day-chevron">▾</div>
+      </div>
+      <div class="day-detail" id="detail-${day.key}">
+        ${exRows}
+        <button class="start-btn" onclick="event.stopPropagation();launchTimer('${day.key}')">▶ START TIMER</button>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('screen-plan').innerHTML = html;
+}
+
+function toggleDay(key) {
+  const detail = document.getElementById('detail-'+key);
+  const card = document.getElementById('card-'+key);
+  const wasOpen = detail.classList.contains('open');
+  document.querySelectorAll('.day-detail').forEach(d=>d.classList.remove('open'));
+  document.querySelectorAll('.day-card').forEach(c=>c.classList.remove('open'));
+  if (!wasOpen) { detail.classList.add('open'); card.classList.add('open'); }
+}
+
+function nextStep() {
+  if (state.step < STEPS.length) { state.step++; saveState(); renderPlan(); }
+}
+
+function openProgModal() {
+  let html = '';
+  let lastEtap = 0;
+  STEPS.forEach(st => {
+    if (st.etap !== lastEtap) {
+      if (lastEtap > 0) html += '</div>';
+      html += `<div class="step-sep">ETAP ${st.etap} — L=${st.L}kg / H=${st.H}kg</div><div>`;
+      lastEtap = st.etap;
+    }
+    const isCur = st.step === state.step;
+    const dur = approxMin(st.intRounds);
+    html += `<div class="step-item ${isCur?'active':''}" onclick="setStep(${st.step})">
+      <div class="step-num">${st.step}</div>
+      <div class="step-info">
+        <div class="step-title">Krok ${st.step} — ${st.intRounds} rund interwałów, ${st.tguSets} serie TGU</div>
+        <div class="step-detail">~${dur} min / ćwiczenie &nbsp;·&nbsp; L=${st.L}kg / H=${st.H}kg</div>
+      </div>
+      ${isCur ? '<span style="color:var(--accent);font-size:14px">◀</span>' : ''}
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('step-list').innerHTML = html;
+  document.getElementById('modal-prog').classList.add('open');
+}
+
+function setStep(n) {
+  state.step = n; saveState();
+  closeModal('modal-prog');
+  renderPlan();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════
+let tCfg = { work:60, rest:30, rounds:4 };
+let tSt = { running:false, phase:'work', remaining:60, round:1, iv:null, finished:false };
+let tLabel = null;
+
+function launchTimer(dayKey) {
+  const day = WEEK.find(d=>d.key===dayKey);
+  const mainEx = day?.exercises.find(e=>e.fmt==='interval');
+  const s = curStep();
+  tCfg.rounds = s.intRounds;
+  if (mainEx) {
+    tLabel = { name:mainEx.name, sub:`${kg(mainEx.w,mainEx.squat)}kg (${mainEx.w})  ·  ${s.intRounds} rund  ·  ${tCfg.work}s / ${tCfg.rest}s` };
+  } else { tLabel = null; }
+  showScreen('timer');
+  resetTimer();
+}
+
+function updateTimerUI() {
+  const total = tSt.phase==='work' ? tCfg.work : tCfg.rest;
+  const pct = tSt.remaining / total;
+  const circ = 2*Math.PI*88;
+  const prog = document.getElementById('timer-prog');
+  prog.style.strokeDashoffset = circ*(1-pct);
+  prog.style.stroke = tSt.phase==='work' ? 'var(--accent)' : 'var(--accent2)';
+  const s = tSt.remaining;
+  document.getElementById('timer-display').textContent =
+    s >= 60 ? Math.floor(s/60)+':'+String(s%60).padStart(2,'0') : String(s).padStart(2,'0');
+  document.getElementById('timer-round-info').textContent = 'RUNDA '+tSt.round+' / '+tCfg.rounds;
+  const ph = document.getElementById('timer-phase');
+  if (tSt.finished) { ph.textContent='KONIEC!'; ph.className='timer-phase done'; }
+  else if (!tSt.running && tSt.remaining===total) { ph.textContent='GOTOWY'; ph.className='timer-phase ready'; }
+  else { ph.textContent=tSt.phase==='work'?'PRACA':'ODPOCZYNEK'; ph.className='timer-phase '+tSt.phase; }
+  document.getElementById('timer-toggle-btn').textContent = tSt.running?'PAUSE':'START';
+  const info = document.getElementById('timer-ex-info');
+  if (tLabel) {
+    info.style.display='block';
+    document.getElementById('timer-ex-name').textContent=tLabel.name;
+    document.getElementById('timer-ex-sub').textContent=tLabel.sub;
+  } else { info.style.display='none'; }
+}
+
+function updateSettingsUI() {
+  document.getElementById('work-val').textContent=tCfg.work+'s';
+  document.getElementById('rest-val').textContent=tCfg.rest+'s';
+  document.getElementById('rounds-val').textContent=tCfg.rounds;
+}
+
+function toggleTimer() {
+  if (tSt.finished) { resetTimer(); return; }
+  tSt.running ? pauseTimer() : startTick();
+}
+
+function startTick() {
+  tSt.running=true;
+  tSt.iv = setInterval(()=>{ tSt.remaining--; if(tSt.remaining<=0) nextPhase(); updateTimerUI(); },1000);
+  updateTimerUI();
+}
+
+function pauseTimer() { tSt.running=false; clearInterval(tSt.iv); updateTimerUI(); }
+
+function resetTimer() {
+  pauseTimer();
+  tSt={running:false,phase:'work',remaining:tCfg.work,round:1,iv:null,finished:false};
+  updateTimerUI(); updateSettingsUI();
+}
+
+function skipPhase() { if(!tSt.finished) { tSt.remaining=1; } }
+
+function nextPhase() {
+  if (tSt.phase==='work') {
+    tSt.phase='rest'; tSt.remaining=tCfg.rest; beep(440,.15);
+  } else {
+    tSt.round++;
+    if (tSt.round>tCfg.rounds) { pauseTimer(); tSt.finished=true; beep(880,.3); setTimeout(()=>beep(1100,.3),220); return; }
+    tSt.phase='work'; tSt.remaining=tCfg.work; beep(880,.2);
+  }
+}
+
+function adjustSetting(key,delta) {
+  if(key==='rounds') tCfg.rounds=Math.max(1,tCfg.rounds+delta);
+  else tCfg[key]=Math.max(5,tCfg[key]+delta);
+  if(!tSt.running&&!tSt.finished) tSt.remaining=tCfg[tSt.phase==='work'?'work':'rest'];
+  updateSettingsUI(); updateTimerUI();
+}
+
+function beep(freq,vol) {
+  try {
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=freq;g.gain.value=vol;
+    o.start();o.stop(ctx.currentTime+.15);
+  } catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════════════════
+function renderCalendar() {
+  const MONTHS=['STYCZEŃ','LUTY','MARZEC','KWIECIEŃ','MAJ','CZERWIEC','LIPIEC','SIERPIEŃ','WRZESIEŃ','PAŹDZIERNIK','LISTOPAD','GRUDZIEŃ'];
+  const DAY_KEYS=['sun','mon','tue','wed','thu','fri','sat'];
+  const todayStr=new Date().toISOString().split('T')[0];
+  const sess=state.sessions;
+  const done=Object.values(sess).filter(s=>s.status==='done').length;
+  const skip=Object.values(sess).filter(s=>s.status==='skipped').length;
+  const total=done+skip;
+  const pct=total>0?Math.round(done/total*100):0;
+
+  // Build calendar grid
+  const firstDay=new Date(calYear,calMonth,1);
+  const lastDay=new Date(calYear,calMonth+1,0);
+  const startDow=(firstDay.getDay()+6)%7;
+  let calCells='';
+  ['PN','WT','ŚR','CZ','PT','SB','ND'].forEach(d=>calCells+=`<div class="cal-dow">${d}</div>`);
+  for(let i=0;i<startDow;i++) calCells+=`<div class="cal-day other"></div>`;
+  for(let d=1;d<=lastDay.getDate();d++){
+    const date=new Date(calYear,calMonth,d);
+    const ds=date.toISOString().split('T')[0];
+    const dk=DAY_KEYS[date.getDay()];
+    const isTrain=WEEK.find(w=>w.key===dk)?.type==='train';
+    const s=sess[ds];
+    const isToday=ds===todayStr;
+    let cls='cal-day';
+    if(isToday) cls+=' today';
+    if(s?.status==='done') cls+=' done';
+    else if(s?.status==='skipped') cls+=' skipped';
+    else if(isTrain) cls+=' train';
+    const dot=(isTrain||s)?'<div class="cal-dot"></div>':'';
+    calCells+=`<div class="${cls}" onclick="openLogModal('${ds}','${dk}')">${d}${dot}</div>`;
+  }
+
+  // History list
+  const DAY_LBL={mon:'Poniedziałek',tue:'Wtorek',wed:'Środa',thu:'Czwartek',fri:'Piątek',sat:'Sobota',sun:'Niedziela'};
+  const DAY_PLAN={mon:'Swing L + TGU H',tue:'C&P H + Squat L',thu:'Swing H + TGU L',fri:'C&P L + Squat H'};
+  const entries=Object.entries(sess).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,30);
+  let histHtml=entries.length ? entries.map(([ds,s])=>{
+    const [y,m,d]=ds.split('-');
+    return `<div class="history-item">
+      <div class="history-date">${d}.${m}.${y}</div>
+      <div class="history-info">
+        <div class="history-title">${DAY_LBL[s.dayKey]||s.dayKey}</div>
+        <div class="history-sub">${DAY_PLAN[s.dayKey]||'—'}</div>
+      </div>
+      <div class="history-status ${s.status==='done'?'status-done':'status-skip'}">${s.status==='done'?'✓ WYKONANE':'✗ POMINIĘTE'}</div>
+    </div>`;
+  }).join('') : `<div class="empty-state">BRAK HISTORII<br>ZACZNIJ TRENOWAĆ</div>`;
+
+  document.getElementById('screen-calendar').innerHTML = `
+    <div class="screen-title">KALENDARZ</div>
+    <div class="screen-sub">HISTORIA SESJI</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val">${done}</div><div class="stat-label">Wykonane</div></div>
+      <div class="stat-card"><div class="stat-val">${pct}%</div><div class="stat-label">Skuteczność</div></div>
+      <div class="stat-card"><div class="stat-val">${skip}</div><div class="stat-label">Pominięte</div></div>
+      <div class="stat-card"><div class="stat-val">${total}</div><div class="stat-label">Łącznie</div></div>
+    </div>
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calPrev()">‹</button>
+      <div class="cal-month">${MONTHS[calMonth]} ${calYear}</div>
+      <button class="cal-nav" onclick="calNext()">›</button>
+    </div>
+    <div class="cal-legend">
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent2)"></div>WYKONANE</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent3)"></div>POMINIĘTE</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--border)"></div>ZAPLANOWANE</div>
+    </div>
+    <div class="cal-grid">${calCells}</div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Historia</div>
+    ${histHtml}`;
+}
+
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+
+function openLogModal(ds,dk){
+  pendingLogDate=ds; pendingLogDayKey=dk;
+  const DAY_LBL={mon:'Poniedziałek',tue:'Wtorek',wed:'Środa',thu:'Czwartek',fri:'Piątek',sat:'Sobota',sun:'Niedziela'};
+  const [y,m,d]=ds.split('-');
+  document.getElementById('modal-log-title').textContent=DAY_LBL[dk]||dk;
+  document.getElementById('modal-log-sub').textContent=`${d}.${m}.${y}`;
+  document.getElementById('modal-log').classList.add('open');
+}
+
+function logSession(status){
+  if(!pendingLogDate) return;
+  state.sessions[pendingLogDate]={dayKey:pendingLogDayKey,status};
+  saveState();
+  closeModal('modal-log');
+  renderCalendar();
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════════════
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelector(`[onclick="showScreen('${name}')"]`).classList.add('active');
+  if(name==='plan') renderPlan();
+  if(name==='calendar') renderCalendar();
+  if(name==='timer'){updateTimerUI();updateSettingsUI();}
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// INIT
+renderPlan();
+updateTimerUI();
+updateSettingsUI();
+</script>
+</body>
+</html>
