@@ -149,7 +149,39 @@ main{flex:1;overflow-y:auto;overflow-x:hidden}
 .step-title{font-size:13px;font-weight:600;margin-bottom:2px}
 .step-detail{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
 .step-sep{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:8px 4px 4px;border-top:1px solid var(--border);margin-top:4px}
+.kb-manager{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px}
+.kb-manager-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.kb-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.kb-chip{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:all .2s;letter-spacing:1px}
+.kb-chip.owned{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,.08)}
+.kb-suggest{margin-top:8px;padding:10px 12px;background:rgba(71,255,212,.06);border:1px solid rgba(71,255,212,.2);border-radius:8px;font-size:12px;color:var(--accent2);font-family:'DM Mono',monospace;line-height:1.6}
+.rpe-row{margin-bottom:14px}
+.rpe-label{font-size:12px;font-weight:600;margin-bottom:8px}
+.rpe-label span{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-left:6px}
+.rpe-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.rpe-btn{padding:10px 6px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4}
+.rpe-btn:hover{border-color:var(--text2)}
+.rpe-btn.sel-easy{border-color:var(--accent2);background:rgba(71,255,212,.1);color:var(--accent2)}
+.rpe-btn.sel-good{border-color:var(--accent);background:rgba(232,255,71,.08);color:var(--accent)}
+.rpe-btn.sel-hard{border-color:var(--accent3);background:rgba(255,107,71,.08);color:var(--accent3)}
+.suggestion-card{border-radius:10px;padding:14px 16px;margin-bottom:12px;border:2px solid}
+.sug-up{background:rgba(71,255,212,.06);border-color:rgba(71,255,212,.3)}
+.sug-stay{background:rgba(232,255,71,.04);border-color:rgba(232,255,71,.2)}
+.sug-down{background:rgba(255,107,71,.06);border-color:rgba(255,107,71,.3)}
+.sug-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:4px}
+.sug-detail{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.6;margin-bottom:12px}
 
+.chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.chart-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:4px}
+.chart-sub{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:14px}
+.chart-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.chart-tab{padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:1px}
+.chart-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,.06)}
+.chart-canvas-wrap{position:relative;width:100%;height:160px}
+.chart-empty{text-align:center;padding:40px 0;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px}
+.chart-legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
+.chart-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.chart-legend-dot{width:8px;height:8px;border-radius:50%}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
@@ -230,12 +262,46 @@ main{flex:1;overflow-y:auto;overflow-x:hidden}
     <button class="modal-close" onclick="closeModal('modal-log')">×</button>
     <div class="modal-title" id="modal-log-title"></div>
     <div class="modal-sub" id="modal-log-sub"></div>
-    <button class="modal-btn primary" onclick="logSession('done')">✓ WYKONANE</button>
-    <button class="modal-btn danger" onclick="logSession('skipped')">✗ POMINIĘTE</button>
-    <button class="modal-btn secondary" onclick="closeModal('modal-log')">ANULUJ</button>
+    <button class="modal-btn primary" id="modal-log-done" onclick="toggleSession('done')">✓ WYKONANE</button>
+    <button class="modal-btn danger" id="modal-log-skipped" onclick="toggleSession('skipped')">✗ POMINIĘTE</button>
   </div>
 </div>
 
+
+<!-- MODAL: ankieta RPE -->
+<div class="modal-bg" id="modal-rpe">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-rpe')">×</button>
+    <div class="modal-title">JAK BYŁO?</div>
+    <div class="modal-sub" id="rpe-modal-sub">Oceń każde ćwiczenie</div>
+    <div id="rpe-questions"></div>
+    <button class="modal-btn primary" id="rpe-submit-btn" onclick="submitRPE()" style="margin-top:8px">ZAPISZ OCENĘ</button>
+    <button class="modal-btn secondary" onclick="closeModal('modal-rpe')">POMIŃ</button>
+  </div>
+</div>
+
+<!-- MODAL: sugestia progresji -->
+<div class="modal-bg" id="modal-suggestion">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-suggestion')">×</button>
+    <div class="modal-title">PODSUMOWANIE TYGODNIA</div>
+    <div class="modal-sub">Na podstawie Twoich ocen z tego tygodnia</div>
+    <div id="suggestion-content"></div>
+    <button class="modal-btn secondary" style="margin-top:8px" onclick="closeModal('modal-suggestion')">ZAMKNIJ</button>
+  </div>
+</div>
+
+<!-- MODAL: exercise override -->
+<div class="modal-bg" id="modal-override">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-override')">×</button>
+    <div class="modal-title" id="override-title">USTAW KROK</div>
+    <div class="modal-sub" id="override-sub">Wybierz krok dla tego ćwiczenia</div>
+    <div id="override-list" class="step-list"></div>
+    <button class="modal-btn danger" id="override-reset-btn" onclick="resetOverride()" style="display:none">✕ USUŃ NADPISANIE (wróć do globalnego)</button>
+    <button class="modal-btn secondary" onclick="closeModal('modal-override')">ANULUJ</button>
+  </div>
+</div>
 <!-- MODAL: progression -->
 <div class="modal-bg" id="modal-prog">
   <div class="modal">
@@ -255,18 +321,18 @@ main{flex:1;overflow-y:auto;overflow-x:hidden}
 // tguSets:   sets for TGU (1L+1P per set, 30s rest between)
 // ═══════════════════════════════════════════════════════════
 const STEPS = [
-  { step:1,  L:6,  H:8,  SL:8,  SH:12, intRounds:4,  tguSets:3, etap:1 },
-  { step:2,  L:6,  H:8,  SL:8,  SH:12, intRounds:6,  tguSets:3, etap:1 },
-  { step:3,  L:6,  H:8,  SL:8,  SH:12, intRounds:8,  tguSets:4, etap:1 },
-  { step:4,  L:6,  H:8,  SL:8,  SH:12, intRounds:10, tguSets:5, etap:1 },
-  { step:5,  L:8,  H:12, SL:12, SH:16, intRounds:4,  tguSets:3, etap:2 },
-  { step:6,  L:8,  H:12, SL:12, SH:16, intRounds:6,  tguSets:3, etap:2 },
-  { step:7,  L:8,  H:12, SL:12, SH:16, intRounds:8,  tguSets:4, etap:2 },
-  { step:8,  L:8,  H:12, SL:12, SH:16, intRounds:10, tguSets:5, etap:2 },
-  { step:9,  L:12, H:16, SL:16, SH:16, intRounds:4,  tguSets:3, etap:3 },
-  { step:10, L:12, H:16, SL:16, SH:16, intRounds:6,  tguSets:3, etap:3 },
-  { step:11, L:12, H:16, SL:16, SH:16, intRounds:8,  tguSets:4, etap:3 },
-  { step:12, L:12, H:16, SL:16, SH:16, intRounds:10, tguSets:5, etap:3 },
+  { step:1,  L:6,  H:8,  SL:6,  SH:8,  intRounds:4,  tguSets:3, etap:1 },
+  { step:2,  L:6,  H:8,  SL:6,  SH:8,  intRounds:6,  tguSets:3, etap:1 },
+  { step:3,  L:6,  H:8,  SL:6,  SH:8,  intRounds:8,  tguSets:4, etap:1 },
+  { step:4,  L:6,  H:8,  SL:6,  SH:8,  intRounds:10, tguSets:5, etap:1 },
+  { step:5,  L:8,  H:12, SL:8,  SH:12, intRounds:4,  tguSets:3, etap:2 },
+  { step:6,  L:8,  H:12, SL:8,  SH:12, intRounds:6,  tguSets:3, etap:2 },
+  { step:7,  L:8,  H:12, SL:8,  SH:12, intRounds:8,  tguSets:4, etap:2 },
+  { step:8,  L:8,  H:12, SL:8,  SH:12, intRounds:10, tguSets:5, etap:2 },
+  { step:9,  L:12, H:16, SL:12, SH:16, intRounds:4,  tguSets:3, etap:3 },
+  { step:10, L:12, H:16, SL:12, SH:16, intRounds:6,  tguSets:3, etap:3 },
+  { step:11, L:12, H:16, SL:12, SH:16, intRounds:8,  tguSets:4, etap:3 },
+  { step:12, L:12, H:16, SL:12, SH:16, intRounds:10, tguSets:5, etap:3 },
 ];
 
 const WARMUPS = {
@@ -307,6 +373,70 @@ const COOLDOWNS = {
   ]},
 };
 
+
+// ═══════════════════════════════════════════════════════════
+// MOBILITY VIDEOS
+// ═══════════════════════════════════════════════════════════
+const MOBILITY_ALL = [
+  { id:'8ybN2gFraSM', label:'Ramiona, kręgosłup, biodra',            dur:21 },
+  { id:'VpIfMqlXE-I', label:'Ramiona, biodra, kręgosłup, kostki',    dur:33 },
+  { id:'md7g6D3RTqA', label:'Kostki, biodra, kręgosłup, ramiona',    dur:32 },
+  { id:'TMvEGPklJ68', label:'Biodra, kostki, stopy',                 dur:21 },
+  { id:'JBGkPbvQdKY', label:'Ramiona, kręgosłup, biodra',            dur:15 },
+  { id:'lUXlwCXMlgk', label:'Cały kręgosłup (szyja, plecy, lędźwie)',dur:26 },
+];
+
+// Łagodniejsze filmy na niedzielę (max ~21 min)
+const MOBILITY_EASY = ['8ybN2gFraSM','TMvEGPklJ68','JBGkPbvQdKY'];
+
+// Pobierz lub wylosuj mobility dla danego tygodnia
+// weekKey = "YYYY-WW" (rok + numer tygodnia ISO)
+function getISOWeek(date) {
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - (d.getDay()+6)%7);
+  const w1 = new Date(d.getFullYear(),0,4);
+  return d.getFullYear() + '-W' + String(1+Math.round(((d-w1)/86400000-3+(w1.getDay()+6)%7)/7)).padStart(2,'0');
+}
+
+function getMobilityForWeek(weekKey) {
+  const stored = JSON.parse(localStorage.getItem('kb_mobility') || '{}');
+  if (stored[weekKey]) return stored[weekKey];
+
+  // Losuj 3 różne filmy: wed, sat (z pełnej puli), sun (z łagodnych)
+  // wed i sat nie mogą być takie same
+  const allIds = MOBILITY_ALL.map(v=>v.id);
+  const easyIds = MOBILITY_EASY;
+
+  // Pobierz ostatnio użyty (z poprzedniego tygodnia) żeby nie powtarzać
+  const prevWeeks = Object.keys(stored).sort();
+  const prevKey = prevWeeks[prevWeeks.length-1];
+  const prevUsed = prevKey ? [stored[prevKey].wed, stored[prevKey].sat, stored[prevKey].sun] : [];
+
+  function pickRandom(pool, exclude=[]) {
+    const avail = pool.filter(id => !exclude.includes(id));
+    const src = avail.length > 0 ? avail : pool;
+    return src[Math.floor(Math.random() * src.length)];
+  }
+
+  const wed = pickRandom(allIds, prevUsed);
+  const sat = pickRandom(allIds, [...prevUsed, wed]);
+  const sun = pickRandom(easyIds, [wed, sat]);
+
+  const week = { wed, sat, sun };
+  stored[weekKey] = week;
+  localStorage.setItem('kb_mobility', JSON.stringify(stored));
+  return week;
+}
+
+function getMobilityVideo(dayKey) {
+  const today = new Date();
+  const weekKey = getISOWeek(today);
+  const week = getMobilityForWeek(weekKey);
+  const id = week[dayKey];
+  return MOBILITY_ALL.find(v => v.id === id) || null;
+}
+
 const WEEK = [
   { key:'mon', name:'PN', type:'train', label:'Swing L + TGU H',
     exercises:[
@@ -345,24 +475,146 @@ const WEEK = [
 // STATE
 // ═══════════════════════════════════════════════════════════
 function loadState() {
-  try { return JSON.parse(localStorage.getItem('kb2_state')) || { step:1, sessions:{} }; }
-  catch { return { step:1, sessions:{} }; }
+  const def = { step:1, sessions:{}, overrides:{}, ownedKBs:[4,6,8,12,16] };
+  // overrides: { 'swing': {step:3}, 'squat': {step:5}, ... }
+  try { return Object.assign(def, JSON.parse(localStorage.getItem('kb2_state')) || {}); }
+  catch { return def; }
 }
 function saveState() { localStorage.setItem('kb2_state', JSON.stringify(state)); }
 
 let state = loadState();
+
+let pendingOverrideKey = null;
+const EX_NAMES = { swing:'Swing', squat:'Squat', cp:'Clean & Press', tgu:'Turkish Get-Up' };
+
+function openOverrideModal(exKey) {
+  pendingOverrideKey = exKey;
+  const curOv = state.overrides[exKey];
+  const globalStep = state.step;
+  document.getElementById('override-title').textContent = 'KROK: ' + EX_NAMES[exKey];
+  document.getElementById('override-sub').textContent =
+    curOv !== undefined
+      ? `Aktualnie: krok ${curOv+1} (globalny: ${globalStep})`
+      : `Aktualnie: krok globalny (${globalStep})`;
+  const resetBtn = document.getElementById('override-reset-btn');
+  resetBtn.style.display = curOv !== undefined ? 'block' : 'none';
+
+  let html = '';
+  let lastEtap = 0;
+  STEPS.forEach(st => {
+    if (st.etap !== lastEtap) {
+      if (lastEtap > 0) html += '</div>';
+      html += `<div class="step-sep">ETAP ${st.etap} — L=${st.L}kg / H=${st.H}kg</div><div>`;
+      lastEtap = st.etap;
+    }
+    const isGlobal = st.step === globalStep && curOv === undefined;
+    const isOv = st.step === (curOv !== undefined ? curOv+1 : -1);
+    const isCur = isGlobal || isOv;
+    html += `<div class="step-item ${isCur?'active':''}" onclick="setOverride('${exKey}',${st.step})">
+      <div class="step-num">${st.step}</div>
+      <div class="step-info">
+        <div class="step-title">Krok ${st.step} — ${st.intRounds} rund, ${st.tguSets} serie TGU</div>
+        <div class="step-detail">~${approxMin(st.intRounds)} min / ćw  ·  L=${st.L}kg / H=${st.H}kg</div>
+      </div>
+      ${isGlobal ? '<span style="color:var(--muted);font-size:10px;font-family:monospace">GLOBALNY</span>' : ''}
+      ${isOv ? '<span style="color:var(--accent3);font-size:14px">★</span>' : ''}
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('override-list').innerHTML = html;
+  document.getElementById('modal-override').classList.add('open');
+}
+
+function setOverride(exKey, stepNum) {
+  state.overrides[exKey] = stepNum - 1; // store 0-based index
+  saveState();
+  closeModal('modal-override');
+  renderPlan();
+}
+
+function resetOverride() {
+  if (pendingOverrideKey) {
+    delete state.overrides[pendingOverrideKey];
+    saveState();
+    closeModal('modal-override');
+    renderPlan();
+  }
+}
+
 let pendingLogDate = null;
 let pendingLogDayKey = null;
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
-function curStep() { return STEPS[Math.min(state.step,STEPS.length)-1]; }
-function kg(w, isSquat) {
+// All available KB weights in the app
+const ALL_KBS = [4,6,8,10,12,14,16,20,24,28,32];
+
+function getOwnedKBs() {
+  return state.ownedKBs || [4,6,8,12,16];
+}
+
+function toggleKB(kg) {
+  const owned = getOwnedKBs();
+  const idx = owned.indexOf(kg);
+  if (idx >= 0) state.ownedKBs = owned.filter(w => w !== kg);
+  else state.ownedKBs = [...owned, kg].sort((a,b)=>a-b);
+  saveState();
+  renderPlan();
+}
+
+// Find the best matching step given owned KBs
+function suggestNextStep() {
+  const owned = getOwnedKBs();
+  const cur = curStep();
+  // Find first step beyond current where both L and H are owned
+  for (let i = state.step; i < STEPS.length; i++) {
+    const st = STEPS[i];
+    if (owned.includes(st.L) && owned.includes(st.H) &&
+        owned.includes(st.SL) && owned.includes(st.SH)) {
+      if (st.step > cur.step) return st;
+    }
+  }
+  return null;
+}
+
+// Check if current step weights are all owned
+function currentStepOwned() {
+  const owned = getOwnedKBs();
   const s = curStep();
+  return owned.includes(s.L) && owned.includes(s.H) &&
+         owned.includes(s.SL) && owned.includes(s.SH);
+}
+
+function curStep() { return STEPS[Math.min(state.step,STEPS.length)-1]; }
+
+// Get step for a specific exercise (uses override if set, else global)
+function exStep(exKey) {
+  const ov = state.overrides[exKey];
+  if (ov !== undefined) return STEPS[Math.min(ov, STEPS.length)-1];
+  return curStep();
+}
+
+// exKey: 'swing','squat','cp','tgu'
+function kg(w, isSquat, exKey) {
+  const s = exKey ? exStep(exKey) : curStep();
   if (isSquat) return w==='L' ? s.SL : s.SH;
   return w==='L' ? s.L : s.H;
 }
 function approxMin(rounds) { return Math.round(rounds*90/60); }
+
+function getExKey(ex) {
+  if (ex.name.includes('Swing')) return 'swing';
+  if (ex.name.includes('Squat')) return 'squat';
+  if (ex.name.includes('Clean')) return 'cp';
+  if (ex.name.includes('Turkish')) return 'tgu';
+  return null;
+}
+
+function getExRounds(ex) {
+  const key = getExKey(ex);
+  const s = key ? exStep(key) : curStep();
+  return ex.fmt === 'tgu' ? s.tguSets : s.intRounds;
+}
 
 // ═══════════════════════════════════════════════════════════
 // PLAN SCREEN
@@ -373,9 +625,23 @@ function renderPlan() {
   const pct = Math.round((state.step / STEPS.length) * 100);
   const isLast = state.step >= STEPS.length;
 
+  const owned = getOwnedKBs();
+  const suggested = suggestNextStep();
+  const stepOwned = currentStepOwned();
+
   let html = `
     <div class="screen-title">KB PROTOCOL</div>
     <div class="screen-sub">WILDMAN ATHLETICA METHOD</div>
+
+    <div class="kb-manager">
+      <div class="kb-manager-title">Moje kettlebell'e</div>
+      <div class="kb-grid">
+        ${ALL_KBS.map(kg => `<div class="kb-chip ${owned.includes(kg)?'owned':''}" onclick="toggleKB(${kg})">${kg}kg</div>`).join('')}
+      </div>
+      ${!stepOwned ? `<div class="kb-suggest">⚠️ Brakuje Ci kettlebelli na aktualny krok (L=${s.L}kg, H=${s.H}kg) — wróć do poprzedniego etapu lub kup brakujące wagi.</div>` : ''}
+      ${suggested ? `<div class="kb-suggest">→ Masz już kettlebell'e na <strong>Etap ${suggested.etap} Krok ${suggested.step}</strong> (L=${suggested.L}kg / H=${suggested.H}kg) — możesz przejść gdy będziesz gotowy.</div>` : ''}
+    </div>
+
     <div class="prog-banner">
       <div class="prog-top">
         <div>
@@ -403,24 +669,57 @@ function renderPlan() {
     const todayCls = isToday ? ' today' : '';
 
     if (day.type === 'rest') {
-      html += `<div class="day-card${todayCls}">
+      const mob = ['wed','sat','sun'].includes(day.key) ? getMobilityVideo(day.key) : null;
+      const isSun = day.key === 'sun';
+      const mobLabel = mob ? mob.label : '';
+      const mobDur = mob ? mob.dur + ' min' : '';
+      const mobUrl = mob ? 'https://www.youtube.com/watch?v=' + mob.id : '';
+      html += `<div class="day-card${todayCls}" ${mob?`id="card-${day.key}" onclick="toggleDay('${day.key}')"`:''}> 
         <div class="day-header">
           <div class="day-name" style="color:var(--muted)">${day.name}</div>
-          <div class="day-type"><div class="day-type-label" style="color:var(--muted)">${day.label}</div></div>
-          ${isToday ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);flex-shrink:0"></div>' : ''}
+          <div class="day-type">
+            <div class="day-type-label" style="color:var(--muted)">${isSun?'ODPOCZYNEK + MOBILITY (łagodne)':'ODPOCZYNEK + MOBILITY'}</div>
+            ${mob ? `<div class="day-exercises">${mobLabel} · ${mobDur}</div>` : ''}
+          </div>
+          ${mob ? '<div class="day-chevron" style="color:var(--muted)">▾</div>' : ''}
+          ${isToday && !mob ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);flex-shrink:0"></div>' : ''}
         </div>
+        ${mob ? `<div class="day-detail" id="detail-${day.key}">
+          <div class="ex-row">
+            <div>
+              <div class="ex-name">Mobility</div>
+              <div class="ex-detail">${mobLabel} · ${mobDur}</div>
+              <div style="margin-top:8px">
+                <a href="${mobUrl}" target="_blank"
+                  style="display:inline-flex;align-items:center;gap:5px;padding:8px 16px;
+                  background:rgba(71,255,212,.08);border:1px solid rgba(71,255,212,.25);
+                  border-radius:6px;color:var(--accent2);text-decoration:none;
+                  font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px">
+                  ▶ OTWÓRZ NA YOUTUBE
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>` : ''}
       </div>`;
       return;
     }
 
     const mainExes = day.exercises.filter(e => e.w);
     const exSummary = mainExes.map(e => {
-      const vol = e.fmt==='tgu' ? `${s.tguSets} ser.` : `${s.intRounds} rund`;
-      return `${e.name} <span class="badge badge-${e.w}">${e.w}·${kg(e.w,e.squat)}kg</span> ${vol}`;
+      const key = getExKey(e);
+      const es = key ? exStep(key) : s;
+      const hasOv = key && state.overrides[key] !== undefined;
+      const vol = e.fmt==='tgu' ? `${es.tguSets} ser.` : `${es.intRounds} rund`;
+      const ovMark = hasOv ? ' <span style="color:var(--accent3);font-size:10px">★</span>' : '';
+      return `${e.name}${ovMark} <span class="badge badge-${e.w}">${e.w}·${kg(e.w,e.squat,key)}kg</span> ${vol}`;
     }).join('<br>');
 
     let exRows = '';
     day.exercises.forEach(ex => {
+      const exKey = getExKey(ex);
+      const es = exKey ? exStep(exKey) : s;
+      const hasOv = exKey && state.overrides[exKey] !== undefined;
       let detail = '';
       if (ex.fmt === 'fixed') {
         const cd = COOLDOWNS[day.key];
@@ -429,9 +728,11 @@ function renderPlan() {
         else if (ex.name === 'Rozgrzewka' && wu) detail = `${wu.dur} min`;
         else detail = ex.detail;
       } else if (ex.fmt === 'interval') {
-        detail = `${kg(ex.w,ex.squat)}kg (${ex.w})  ·  ${s.intRounds} rund  ·  60s / 30s  ·  ~${approxMin(s.intRounds)} min`;
+        const ovNote = hasOv ? ` <span style="color:var(--accent3);font-size:10px">(nadpisano: krok ${state.overrides[exKey]+1})</span>` : '';
+        detail = `${kg(ex.w,ex.squat,exKey)}kg (${ex.w})  ·  ${es.intRounds} rund  ·  60s / 30s  ·  ~${approxMin(es.intRounds)} min${ovNote}`;
       } else if (ex.fmt === 'tgu') {
-        detail = `${kg(ex.w,ex.squat)}kg (${ex.w})  ·  ${s.tguSets} rundy  ·  1L+1P bez przerwy  ·  30s między rundami`;
+        const ovNote = hasOv ? ` <span style="color:var(--accent3);font-size:10px">(nadpisano: krok ${state.overrides[exKey]+1})</span>` : '';
+        detail = `${kg(ex.w,ex.squat,exKey)}kg (${ex.w})  ·  ${es.tguSets} rundy  ·  1L+1P bez przerwy  ·  30s między rundami${ovNote}`;
       }
 
       // Warmup / Cooldown links
@@ -451,11 +752,17 @@ function renderPlan() {
           ).join('') + '</div>';
       }
 
+      const ovBtn = exKey ? `<button onclick="event.stopPropagation();openOverrideModal('${exKey}')"
+        style="margin-top:8px;padding:5px 10px;background:none;border:1px solid ${hasOv?'var(--accent3)':'var(--border)'};
+        color:${hasOv?'var(--accent3)':'var(--muted)'};border-radius:5px;font-size:10px;font-family:'DM Mono',monospace;
+        cursor:pointer;letter-spacing:1px">${hasOv?'★ ZMIEŃ KROK':'USTAW KROK'}</button>` : '';
+
       exRows += `<div class="ex-row">
         <div style="width:100%">
           <div class="ex-name">${ex.name}${ex.w ? ` <span class="badge badge-${ex.w}">${ex.w}</span>` : ''}</div>
           <div class="ex-detail">${detail}</div>
           ${ex.note ? `<div class="ex-note">${ex.note}</div>` : ''}
+          ${ovBtn}
           ${cooldownLinks}
         </div>
       </div>`;
@@ -529,17 +836,38 @@ function setStep(n) {
 // ═══════════════════════════════════════════════════════════
 let tCfg = { work:60, rest:30, rounds:4 };
 let tSt = { running:false, phase:'work', remaining:60, round:1, iv:null, finished:false };
+let tQueue = [];   // array of exercises to do
+let tQueueIdx = 0; // current exercise index
 let tLabel = null;
 
-function launchTimer(dayKey) {
+function buildQueue(dayKey) {
   const day = WEEK.find(d=>d.key===dayKey);
-  const mainEx = day?.exercises.find(e=>e.fmt==='interval');
-  const s = curStep();
-  tCfg.rounds = s.intRounds;
-  if (mainEx) {
-    tLabel = { name:mainEx.name, sub:`${kg(mainEx.w,mainEx.squat)}kg (${mainEx.w})  ·  ${s.intRounds} rund  ·  ${tCfg.work}s / ${tCfg.rest}s` };
-  } else { tLabel = null; }
+  // Only interval exercises (not TGU — that uses sets, not timer)
+  return day.exercises
+    .filter(e => e.fmt === 'interval')
+    .map(e => {
+      const key = getExKey(e);
+      const es = key ? exStep(key) : curStep();
+      return {
+        name: e.name,
+        rounds: es.intRounds,
+        sub: `${kg(e.w,e.squat,key)}kg (${e.w})  ·  ${es.intRounds} rund  ·  ${tCfg.work}s / ${tCfg.rest}s`,
+      };
+    });
+}
+
+function launchTimer(dayKey) {
+  tQueue = buildQueue(dayKey);
+  tQueueIdx = 0;
   showScreen('timer');
+  loadQueueItem(0);
+}
+
+function loadQueueItem(idx) {
+  if (idx >= tQueue.length) return;
+  const ex = tQueue[idx];
+  tCfg.rounds = ex.rounds;
+  tLabel = { name: ex.name, sub: ex.sub, idx: idx+1, total: tQueue.length };
   resetTimer();
 }
 
@@ -555,15 +883,34 @@ function updateTimerUI() {
     s >= 60 ? Math.floor(s/60)+':'+String(s%60).padStart(2,'0') : String(s).padStart(2,'0');
   document.getElementById('timer-round-info').textContent = 'RUNDA '+tSt.round+' / '+tCfg.rounds;
   const ph = document.getElementById('timer-phase');
-  if (tSt.finished) { ph.textContent='KONIEC!'; ph.className='timer-phase done'; }
-  else if (!tSt.running && tSt.remaining===total) { ph.textContent='GOTOWY'; ph.className='timer-phase ready'; }
-  else { ph.textContent=tSt.phase==='work'?'PRACA':'ODPOCZYNEK'; ph.className='timer-phase '+tSt.phase; }
-  document.getElementById('timer-toggle-btn').textContent = tSt.running?'PAUSE':'START';
+
+  if (tSt.finished) {
+    const hasNext = tQueueIdx + 1 < tQueue.length;
+    if (hasNext) {
+      ph.textContent = 'NASTĘPNE ĆWICZENIE';
+      ph.className = 'timer-phase done';
+      document.getElementById('timer-toggle-btn').textContent = 'DALEJ';
+    } else {
+      ph.textContent = 'KONIEC TRENINGU!';
+      ph.className = 'timer-phase done';
+      document.getElementById('timer-toggle-btn').textContent = 'RESET';
+    }
+  } else if (!tSt.running && tSt.remaining===total) {
+    ph.textContent='GOTOWY'; ph.className='timer-phase ready';
+    document.getElementById('timer-toggle-btn').textContent = 'START';
+  } else {
+    ph.textContent=tSt.phase==='work'?'PRACA':'ODPOCZYNEK';
+    ph.className='timer-phase '+tSt.phase;
+    document.getElementById('timer-toggle-btn').textContent = tSt.running?'PAUSE':'START';
+  }
+
+  // ex info
   const info = document.getElementById('timer-ex-info');
   if (tLabel) {
     info.style.display='block';
-    document.getElementById('timer-ex-name').textContent=tLabel.name;
-    document.getElementById('timer-ex-sub').textContent=tLabel.sub;
+    document.getElementById('timer-ex-name').textContent =
+      tLabel.name + (tLabel.total > 1 ? `  ${tLabel.idx}/${tLabel.total}` : '');
+    document.getElementById('timer-ex-sub').textContent = tLabel.sub;
   } else { info.style.display='none'; }
 }
 
@@ -574,7 +921,17 @@ function updateSettingsUI() {
 }
 
 function toggleTimer() {
-  if (tSt.finished) { resetTimer(); return; }
+  if (tSt.finished) {
+    const hasNext = tQueueIdx + 1 < tQueue.length;
+    if (hasNext) {
+      tQueueIdx++;
+      loadQueueItem(tQueueIdx);
+    } else {
+      tQueueIdx = 0;
+      loadQueueItem(0);
+    }
+    return;
+  }
   tSt.running ? pauseTimer() : startTick();
 }
 
@@ -624,10 +981,18 @@ function beep(freq,vol) {
 // ═══════════════════════════════════════════════════════════
 // CALENDAR
 // ═══════════════════════════════════════════════════════════
+// Local timezone date string (YYYY-MM-DD) — avoids UTC shift
+function localDateStr(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2,'0');
+  const d = String(date.getDate()).padStart(2,'0');
+  return `${y}-${m}-${d}`;
+}
+
 function renderCalendar() {
   const MONTHS=['STYCZEŃ','LUTY','MARZEC','KWIECIEŃ','MAJ','CZERWIEC','LIPIEC','SIERPIEŃ','WRZESIEŃ','PAŹDZIERNIK','LISTOPAD','GRUDZIEŃ'];
   const DAY_KEYS=['sun','mon','tue','wed','thu','fri','sat'];
-  const todayStr=new Date().toISOString().split('T')[0];
+  const todayStr = localDateStr(new Date());
   const sess=state.sessions;
   const done=Object.values(sess).filter(s=>s.status==='done').length;
   const skip=Object.values(sess).filter(s=>s.status==='skipped').length;
@@ -643,7 +1008,7 @@ function renderCalendar() {
   for(let i=0;i<startDow;i++) calCells+=`<div class="cal-day other"></div>`;
   for(let d=1;d<=lastDay.getDate();d++){
     const date=new Date(calYear,calMonth,d);
-    const ds=date.toISOString().split('T')[0];
+    const ds=localDateStr(date);
     const dk=DAY_KEYS[date.getDay()];
     const isTrain=WEEK.find(w=>w.key===dk)?.type==='train';
     const s=sess[ds];
@@ -661,15 +1026,50 @@ function renderCalendar() {
   const DAY_LBL={mon:'Poniedziałek',tue:'Wtorek',wed:'Środa',thu:'Czwartek',fri:'Piątek',sat:'Sobota',sun:'Niedziela'};
   const DAY_PLAN={mon:'Swing L + TGU H',tue:'C&P H + Squat L',thu:'Swing H + TGU L',fri:'C&P L + Squat H'};
   const entries=Object.entries(sess).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,30);
-  let histHtml=entries.length ? entries.map(([ds,s])=>{
+  // Friday report for current week
+  const fridayReport = (() => {
+    const sug = analyzeSuggestion();
+    if (!sug || sug.total < 2) return '';
+    const col = sug.action==='up'?'var(--accent2)':sug.action==='down'?'var(--accent3)':'var(--accent)';
+    const bg  = sug.action==='up'?'rgba(71,255,212,.06)':sug.action==='down'?'rgba(255,107,71,.06)':'rgba(232,255,71,.04)';
+    return `<div style="background:${bg};border:2px solid ${col};border-radius:10px;padding:14px 16px;margin-bottom:16px;cursor:pointer" onclick="showWeeklySuggestion()">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:${col};letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">📊 Raport tygodnia · ${sug.total} ocen</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:2px">${sug.title}</div>
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">Kliknij żeby zobaczyć szczegóły i sugestię →</div>
+    </div>`;
+  })();
+
+  const RPE_EMOJI = { easy:'😊', good:'💪', hard:'🔥' };
+  const RPE_LABEL = { easy:'lekko', good:'ok', hard:'ciężko' };
+
+  let histHtml = entries.length ? entries.map(([ds,s])=>{
     const [y,m,d]=ds.split('-');
-    return `<div class="history-item">
-      <div class="history-date">${d}.${m}.${y}</div>
+    const hasRPE = s.rpe && Object.keys(s.rpe).length > 0;
+    const isTrain = DAY_EXERCISES[s.dayKey];
+    const rpeHtml = hasRPE
+      ? `<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:4px;line-height:1.6">
+          ${Object.entries(s.rpe).map(([ex,v])=>v?`${RPE_EMOJI[v]} ${ex}: ${RPE_LABEL[v]}`:'').filter(Boolean).join('&nbsp;·&nbsp;')}
+        </div>`
+      : '';
+    const rpeBtn = (s.status==='done' && isTrain)
+      ? `<button onclick="event.stopPropagation();openRPEModal('${ds}','${s.dayKey}')"
+          style="padding:5px 10px;background:none;border:1px solid ${hasRPE?'var(--accent)':'var(--border)'};
+          color:${hasRPE?'var(--accent)':'var(--muted)'};border-radius:5px;font-size:10px;
+          font-family:'DM Mono',monospace;cursor:pointer;letter-spacing:1px;white-space:nowrap;flex-shrink:0">
+          ${hasRPE?'✎ ANKIETA':'+ ANKIETA'}
+        </button>`
+      : '';
+    return `<div class="history-item" style="align-items:flex-start;flex-wrap:wrap;gap:8px">
+      <div class="history-date" style="padding-top:2px">${d}.${m}.${y}</div>
       <div class="history-info">
         <div class="history-title">${DAY_LBL[s.dayKey]||s.dayKey}</div>
         <div class="history-sub">${DAY_PLAN[s.dayKey]||'—'}</div>
+        ${rpeHtml}
       </div>
-      <div class="history-status ${s.status==='done'?'status-done':'status-skip'}">${s.status==='done'?'✓ WYKONANE':'✗ POMINIĘTE'}</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="history-status ${s.status==='done'?'status-done':'status-skip'}">${s.status==='done'?'✓ WYKONANE':'✗ POMINIĘTE'}</div>
+        ${rpeBtn}
+      </div>
     </div>`;
   }).join('') : `<div class="empty-state">BRAK HISTORII<br>ZACZNIJ TRENOWAĆ</div>`;
 
@@ -693,29 +1093,409 @@ function renderCalendar() {
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--border)"></div>ZAPLANOWANE</div>
     </div>
     <div class="cal-grid">${calCells}</div>
-    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Historia</div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;margin-top:8px">Progres</div>
+    <div id="charts-section"></div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;margin-top:20px">Historia</div>
+    ${fridayReport}
     ${histHtml}`;
+  setTimeout(() => renderCharts(), 0);
 }
 
 function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
 function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
 
-function openLogModal(ds,dk){
-  pendingLogDate=ds; pendingLogDayKey=dk;
-  const DAY_LBL={mon:'Poniedziałek',tue:'Wtorek',wed:'Środa',thu:'Czwartek',fri:'Piątek',sat:'Sobota',sun:'Niedziela'};
-  const [y,m,d]=ds.split('-');
-  document.getElementById('modal-log-title').textContent=DAY_LBL[dk]||dk;
-  document.getElementById('modal-log-sub').textContent=`${d}.${m}.${y}`;
+function openLogModal(ds, dk) {
+  pendingLogDate = ds; pendingLogDayKey = dk;
+  const DAY_LBL = {mon:'Poniedziałek',tue:'Wtorek',wed:'Środa',thu:'Czwartek',fri:'Piątek',sat:'Sobota',sun:'Niedziela'};
+  const [y,m,d] = ds.split('-');
+  document.getElementById('modal-log-title').textContent = DAY_LBL[dk] || dk;
+  document.getElementById('modal-log-sub').textContent = `${d}.${m}.${y}`;
+  // Highlight active status
+  const existing = state.sessions[ds]?.status;
+  document.getElementById('modal-log-done').style.opacity    = existing === 'done'    ? '1' : '0.45';
+  document.getElementById('modal-log-skipped').style.opacity = existing === 'skipped' ? '1' : '0.45';
   document.getElementById('modal-log').classList.add('open');
 }
 
-function logSession(status){
-  if(!pendingLogDate) return;
-  state.sessions[pendingLogDate]={dayKey:pendingLogDayKey,status};
+function toggleSession(status) {
+  if (!pendingLogDate) return;
+  const existing = state.sessions[pendingLogDate]?.status;
+  if (existing === status) {
+    // Same button clicked again — remove
+    delete state.sessions[pendingLogDate];
+  } else {
+    // New status — save snapshot
+    const snapshot = {};
+    ['swing','squat','cp','tgu'].forEach(key => {
+      const s = exStep(key);
+      snapshot[key] = {
+        step: s.step,
+        kg: key==='squat' ? { L: s.SL, H: s.SH } : { L: s.L, H: s.H },
+        rounds: s.intRounds,
+        tguSets: s.tguSets,
+      };
+    });
+    const prevRpe = state.sessions[pendingLogDate]?.rpe || {};
+    state.sessions[pendingLogDate] = { dayKey: pendingLogDayKey, status, snapshot, rpe: prevRpe };
+  }
   saveState();
   closeModal('modal-log');
   renderCalendar();
+  // Open RPE for training days marked done
+  if (state.sessions[pendingLogDate]?.status === 'done' && DAY_EXERCISES[pendingLogDayKey]) {
+    setTimeout(() => openRPEModal(pendingLogDate, pendingLogDayKey), 300);
+  }
 }
+
+
+
+// ═══════════════════════════════════════════════════════════
+// RPE SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+// Ćwiczenia per dzień (do ankiety)
+const DAY_EXERCISES = {
+  mon: ['Swing','Turkish Get-Up'],
+  tue: ['Clean & Press','Squat'],
+  thu: ['Swing','Turkish Get-Up'],
+  fri: ['Clean & Press','Squat'],
+};
+
+// RPE values: 'easy' | 'good' | 'hard'
+let pendingRPE = {};   // { exName: value }
+let rpeSessionKey = null;
+
+function openRPEModal(dateStr, dayKey) {
+  const exes = DAY_EXERCISES[dayKey];
+  if (!exes) return;
+  rpeSessionKey = dateStr;
+  pendingRPE = {};
+
+  // Pre-fill from existing ratings if re-opening
+  const existing = state.sessions[dateStr]?.rpe || {};
+  exes.forEach(ex => { pendingRPE[ex] = existing[ex] || null; });
+
+  const [y,m,d] = dateStr.split('-');
+  document.getElementById('rpe-modal-sub').textContent = `${d}.${m}.${y} — ${dayKey==='mon'||dayKey==='thu'?'Swing + TGU':dayKey==='tue'?'C&P + Squat':'C&P + Squat'}`;
+
+  const questionsHtml = exes.map(ex => `
+    <div class="rpe-row">
+      <div class="rpe-label">${ex} <span>Jak było?</span></div>
+      <div class="rpe-btns">
+        <button class="rpe-btn ${pendingRPE[ex]==='easy'?'sel-easy':''}" onclick="selectRPE('${ex}','easy',this)">
+          😊<br>Za lekko
+        </button>
+        <button class="rpe-btn ${pendingRPE[ex]==='good'?'sel-good':''}" onclick="selectRPE('${ex}','good',this)">
+          💪<br>W sam raz
+        </button>
+        <button class="rpe-btn ${pendingRPE[ex]==='hard'?'sel-hard':''}" onclick="selectRPE('${ex}','hard',this)">
+          🔥<br>Za ciężko
+        </button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('rpe-questions').innerHTML = questionsHtml;
+  document.getElementById('modal-rpe').classList.add('open');
+}
+
+function selectRPE(exName, value, btn) {
+  pendingRPE[exName] = value;
+  // Update button styles in the same row
+  const row = btn.closest('.rpe-row');
+  row.querySelectorAll('.rpe-btn').forEach(b => b.className = 'rpe-btn');
+  btn.classList.add('sel-' + value);
+}
+
+function submitRPE() {
+  if (!rpeSessionKey) return;
+  // Save RPE to session
+  if (state.sessions[rpeSessionKey]) {
+    state.sessions[rpeSessionKey].rpe = { ...pendingRPE };
+    saveState();
+  }
+  closeModal('modal-rpe');
+  // If Friday — show weekly suggestion
+  const date = new Date(rpeSessionKey + 'T12:00:00');
+  if (date.getDay() === 5) {
+    setTimeout(() => showWeeklySuggestion(), 300);
+  }
+}
+
+// ─── WEEKLY SUGGESTION LOGIC ──────────────────────────────
+function getWeekRPEs() {
+  // Get current ISO week key
+  const today = new Date();
+  const weekKey = getISOWeek(today);
+
+  // Find Mon-Fri of current week
+  const ratings = []; // flat list of all RPE values this week
+  const perEx = {}; // { exName: [values] }
+
+  Object.entries(state.sessions).forEach(([ds, s]) => {
+    if (!s.rpe || s.status !== 'done') return;
+    // Check if this date is in current week
+    const d = new Date(ds + 'T12:00:00');
+    if (getISOWeek(d) !== weekKey) return;
+    Object.entries(s.rpe).forEach(([ex, val]) => {
+      if (!val) return;
+      ratings.push(val);
+      if (!perEx[ex]) perEx[ex] = [];
+      perEx[ex].push(val);
+    });
+  });
+
+  return { ratings, perEx, total: ratings.length };
+}
+
+function analyzeSuggestion() {
+  const { ratings, perEx, total } = getWeekRPEs();
+  if (total === 0) return null;
+
+  const easy = ratings.filter(r => r === 'easy').length;
+  const good = ratings.filter(r => r === 'good').length;
+  const hard = ratings.filter(r => r === 'hard').length;
+
+  let action, title, detail, cls;
+
+  if (hard >= 2) {
+    action = 'down';
+    title = '↓ ROZWAŻ COFNIĘCIE KROKU';
+    cls = 'sug-down';
+    detail = `${hard} z ${total} ćwiczeń było za ciężkich. Twoje ciało sygnalizuje że potrzebuje więcej czasu na adaptację. Zostań na tym kroku jeszcze tydzień lub cofnij się o jeden krok.`;
+  } else if (easy >= 3) {
+    action = 'up';
+    title = '↑ CZAS NA PROGRESJĘ';
+    cls = 'sug-up';
+    detail = `${easy} z ${total} ćwiczeń było za lekkich. Twoje ciało jest gotowe na więcej. Możesz przejść do następnego kroku.`;
+  } else {
+    action = 'stay';
+    title = '✓ JESTEŚ W IDEALNYM MIEJSCU';
+    cls = 'sug-stay';
+    detail = `${good} z ${total} ćwiczeń było w sam raz${easy > 0 ? `, ${easy} za lekkich` : ''}${hard > 0 ? `, ${hard} za ciężkich` : ''}. Kontynuuj aktualny krok — progres idzie dobrze.`;
+  }
+
+  // Per-exercise breakdown
+  const breakdown = Object.entries(perEx).map(([ex, vals]) => {
+    const e = vals.filter(v=>v==='easy').length;
+    const g = vals.filter(v=>v==='good').length;
+    const h = vals.filter(v=>v==='hard').length;
+    const emoji = h > 0 ? '🔥' : e === vals.length ? '😊' : '💪';
+    return `${emoji} ${ex}: ${vals.map(v=>v==='easy'?'lekko':v==='good'?'ok':'ciężko').join(', ')}`;
+  }).join('<br>');
+
+  return { action, title, detail, cls, breakdown, easy, good, hard, total };
+}
+
+function showWeeklySuggestion() {
+  const sug = analyzeSuggestion();
+  if (!sug) return;
+
+  const nextStep = STEPS[state.step] || null; // step after current
+  const prevStep = state.step > 1 ? STEPS[state.step - 2] : null;
+
+  let actionBtns = '';
+  if (sug.action === 'up' && nextStep) {
+    actionBtns = `<button class="modal-btn primary" onclick="nextStep();closeModal('modal-suggestion')">↑ Przejdź do kroku ${nextStep.step}</button>`;
+  } else if (sug.action === 'down' && prevStep) {
+    actionBtns = `<button class="modal-btn danger" onclick="prevStep();closeModal('modal-suggestion')">↓ Cofnij do kroku ${prevStep.step}</button>`;
+  }
+  actionBtns += `<button class="modal-btn secondary" onclick="closeModal('modal-suggestion')">Zostań na kroku ${state.step}</button>`;
+
+  document.getElementById('suggestion-content').innerHTML = `
+    <div class="suggestion-card ${sug.cls}">
+      <div class="sug-title" style="color:${sug.action==='up'?'var(--accent2)':sug.action==='down'?'var(--accent3)':'var(--accent)'}">${sug.title}</div>
+      <div class="sug-detail">${sug.detail}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);line-height:1.8">${sug.breakdown}</div>
+    </div>
+    ${actionBtns}`;
+
+  document.getElementById('modal-suggestion').classList.add('open');
+}
+
+function prevStep() {
+  if (state.step > 1) { state.step--; saveState(); renderPlan(); }
+}
+
+// Show suggestion button on plan if has week data (whole week, not just Friday)
+function getSuggestionBanner() {
+  const sug = analyzeSuggestion();
+  if (!sug || sug.total < 2) return '';
+  const col = sug.action==='up'?'var(--accent2)':sug.action==='down'?'var(--accent3)':'var(--accent)';
+  const bg  = sug.action==='up'?'rgba(71,255,212,.06)':sug.action==='down'?'rgba(255,107,71,.06)':'rgba(232,255,71,.04)';
+  return `<div style="background:${bg};border:1px solid ${col};border-radius:10px;padding:12px 16px;margin-bottom:16px;cursor:pointer" onclick="showWeeklySuggestion()">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:${col};letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Raport tygodnia · ${sug.total} ocen ↓ kliknij aby rozwinąć</div>
+    <div style="font-size:13px;font-weight:600">${sug.title} →</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHARTS — dwie linie: Ciężar (kg) + Rundy
+// ═══════════════════════════════════════════════════════════
+let activeChartEx = 'swing';
+
+const EX_COLORS = { swing:'#e8ff47', squat:'#47ffd4', cp:'#ff6b47', tgu:'#a78bfa' };
+const EX_LABELS_CHART = { swing:'Swing', squat:'Squat', cp:'Clean & Press', tgu:'TGU' };
+const EX_DAYS = { swing:['mon','thu'], tgu:['mon','thu'], cp:['tue','fri'], squat:['tue','fri'] };
+const COLOR_ENDURANCE = '#888';
+
+function getChartData(exKey, type) {
+  const days = EX_DAYS[exKey] || [];
+  const points = [];
+  Object.entries(state.sessions)
+    .filter(([,s]) => s.status==='done' && days.includes(s.dayKey))
+    .sort((a,b) => a[0].localeCompare(b[0]))
+    .forEach(([ds, s]) => {
+      const [y,m,d] = ds.split('-');
+      const label = d+'.'+m;
+      const snap = s.snapshot ? s.snapshot[exKey] : null;
+      if (type === 'strength') {
+        const kgL = snap ? snap.kg.L : (exKey==='squat' ? curStep().SL : curStep().L);
+        const kgH = snap ? snap.kg.H : (exKey==='squat' ? curStep().SH : curStep().H);
+        points.push({ label, val: Math.round((kgL+kgH)/2*10)/10 });
+      } else {
+        const val = snap
+          ? (exKey==='tgu' ? snap.tguSets : snap.rounds)
+          : (exKey==='tgu' ? curStep().tguSets : curStep().intRounds);
+        points.push({ label, val });
+      }
+    });
+  return points;
+}
+
+function drawDualChart(canvasId, ptS, colS, ptE, colE) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const W = canvas.parentElement ? canvas.parentElement.clientWidth : 320;
+  const H = 170;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  if (!ptS.length && !ptE.length) {
+    ctx.fillStyle='#555'; ctx.font='12px monospace'; ctx.textAlign='center';
+    ctx.fillText('Brak danych — zaloguj sesje jako wykonane', W/2, H/2); return;
+  }
+
+  const allLabels = [...new Set([...ptS.map(p=>p.label),...ptE.map(p=>p.label)])].sort();
+  const pad = {t:18,r:34,b:26,l:34};
+  const cW = W-pad.l-pad.r, cH = H-pad.t-pad.b;
+
+  // Y ranges
+  const vS = ptS.map(p=>p.val), vE = ptE.map(p=>p.val);
+  const minS = vS.length?Math.min(...vS):0, maxS = vS.length?Math.max(...vS):1;
+  const minE = vE.length?Math.min(...vE):0, maxE = vE.length?Math.max(...vE):1;
+  const rS = maxS-minS||1, rE = maxE-minE||1;
+
+  // Grid
+  ctx.lineWidth=1; ctx.strokeStyle='#2a2a2a';
+  for (let i=0;i<=4;i++) {
+    const y = pad.t+cH-(i/4)*cH;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cW,y); ctx.stroke();
+    // left axis (kg)
+    if (vS.length) {
+      const v = minS+(i/4)*rS;
+      ctx.fillStyle=colS+'bb'; ctx.font='9px monospace'; ctx.textAlign='right';
+      ctx.fillText(Number.isInteger(v)?v:v.toFixed(1), pad.l-4, y+3);
+    }
+    // right axis (rundy)
+    if (vE.length) {
+      const v = minE+(i/4)*rE;
+      ctx.fillStyle=colE+'bb'; ctx.font='9px monospace'; ctx.textAlign='left';
+      ctx.fillText(Math.round(v), W-pad.r+4, y+3);
+    }
+  }
+
+  function xPos(lbl) {
+    const idx = allLabels.indexOf(lbl);
+    return allLabels.length===1 ? pad.l+cW/2 : pad.l+(idx/(allLabels.length-1))*cW;
+  }
+
+  function drawLine(pts, col, minV, rangeV) {
+    if (!pts.length) return;
+    const coords = pts.map(p=>({ x:xPos(p.label), y:pad.t+cH-((p.val-minV)/rangeV)*cH }));
+
+    if (coords.length>1) {
+      // Area
+      ctx.beginPath(); ctx.moveTo(coords[0].x, pad.t+cH);
+      coords.forEach(c=>ctx.lineTo(c.x,c.y));
+      ctx.lineTo(coords[coords.length-1].x, pad.t+cH); ctx.closePath();
+      const gr = ctx.createLinearGradient(0,pad.t,0,pad.t+cH);
+      gr.addColorStop(0,col+'28'); gr.addColorStop(1,col+'00');
+      ctx.fillStyle=gr; ctx.fill();
+      // Line
+      ctx.beginPath(); ctx.strokeStyle=col; ctx.lineWidth=2; ctx.lineJoin='round';
+      coords.forEach((c,i)=>i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
+      ctx.stroke();
+    }
+
+    // Dots + values
+    coords.forEach((c,i)=>{
+      ctx.beginPath(); ctx.arc(c.x,c.y,3.5,0,Math.PI*2);
+      ctx.fillStyle=col; ctx.fill();
+      ctx.fillStyle=col; ctx.font='bold 9px monospace'; ctx.textAlign='center';
+      ctx.fillText(pts[i].val, c.x, c.y-7);
+    });
+  }
+
+  drawLine(ptS, colS, minS, rS);
+  drawLine(ptE, colE, minE, rE);
+
+  // X labels
+  allLabels.forEach((lbl,i)=>{
+    if (i===0||i===allLabels.length-1||allLabels.length<=8) {
+      ctx.fillStyle='#555'; ctx.font='9px monospace'; ctx.textAlign='center';
+      ctx.fillText(lbl, xPos(lbl), H-4);
+    }
+  });
+}
+
+function renderCharts() {
+  const el = document.getElementById('charts-section');
+  if (!el) return;
+
+  const col = EX_COLORS[activeChartEx];
+  const exTabs = Object.entries(EX_LABELS_CHART).map(([k,v]) =>
+    `<button class="chart-tab ${k===activeChartEx?'active':''}"
+      onclick="setChartEx('${k}')"
+      style="${k===activeChartEx?`border-color:${EX_COLORS[k]};color:${EX_COLORS[k]};background:${EX_COLORS[k]}11`:''}"
+    >${v}</button>`
+  ).join('');
+
+  const ptS = getChartData(activeChartEx,'strength');
+  const ptE = getChartData(activeChartEx,'endurance');
+  const lastS = ptS[ptS.length-1];
+  const lastE = ptE[ptE.length-1];
+  const n = ptS.length;
+
+  el.innerHTML = `
+    <div class="chart-wrap">
+      <div class="chart-title">PROGRES</div>
+      <div class="chart-tabs">${exTabs}</div>
+      <div style="display:flex;gap:16px;margin-bottom:10px;flex-wrap:wrap;align-items:flex-end">
+        ${lastS?`<div>
+          <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px">CIĘŻAR (śr.)</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${col};line-height:1">${lastS.val} kg</div>
+        </div>`:''}
+        ${lastE?`<div>
+          <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px">RUNDY</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#aaa;line-height:1">${lastE.val}</div>
+        </div>`:''}
+        <div>
+          <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1px">SESJI</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--text);line-height:1">${n}</div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:${col}"></div>Ciężar kg (lewa oś)</div>
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#888"></div>Rundy (prawa oś)</div>
+      </div>
+      <canvas id="chart-canvas" style="display:block;width:100%"></canvas>
+    </div>`;
+
+  setTimeout(()=>drawDualChart('chart-canvas',ptS,col,ptE,COLOR_ENDURANCE), 50);
+}
+
+function setChartEx(key) { activeChartEx=key; renderCharts(); }
 
 // ═══════════════════════════════════════════════════════════
 // NAV
