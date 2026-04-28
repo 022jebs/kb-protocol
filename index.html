@@ -328,18 +328,36 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:env(safe-area-inset
 // tguSets:   sets for TGU (1L+1P per set, 30s rest between)
 // ═══════════════════════════════════════════════════════════
 const STEPS = [
-  { step:1,  L:6,  H:8,  SL:6,  SH:8,  intRounds:4,  tguSets:3, etap:1 },
-  { step:2,  L:6,  H:8,  SL:6,  SH:8,  intRounds:6,  tguSets:3, etap:1 },
-  { step:3,  L:6,  H:8,  SL:6,  SH:8,  intRounds:8,  tguSets:4, etap:1 },
-  { step:4,  L:6,  H:8,  SL:6,  SH:8,  intRounds:10, tguSets:5, etap:1 },
-  { step:5,  L:8,  H:12, SL:8,  SH:12, intRounds:4,  tguSets:3, etap:2 },
-  { step:6,  L:8,  H:12, SL:8,  SH:12, intRounds:6,  tguSets:3, etap:2 },
-  { step:7,  L:8,  H:12, SL:8,  SH:12, intRounds:8,  tguSets:4, etap:2 },
-  { step:8,  L:8,  H:12, SL:8,  SH:12, intRounds:10, tguSets:5, etap:2 },
-  { step:9,  L:12, H:16, SL:12, SH:16, intRounds:4,  tguSets:3, etap:3 },
-  { step:10, L:12, H:16, SL:12, SH:16, intRounds:6,  tguSets:3, etap:3 },
-  { step:11, L:12, H:16, SL:12, SH:16, intRounds:8,  tguSets:4, etap:3 },
-  { step:12, L:12, H:16, SL:12, SH:16, intRounds:10, tguSets:5, etap:3 },
+  // ── ETAP 1: 6/8 — Początkujący ──
+  { step:1,  L:6,  H:8,  SL:6,  SH:8,  intRounds:4,  tguSets:3, etap:1, work:60, rest:30 },
+  { step:2,  L:6,  H:8,  SL:6,  SH:8,  intRounds:6,  tguSets:3, etap:1, work:60, rest:30 },
+  { step:3,  L:6,  H:8,  SL:6,  SH:8,  intRounds:8,  tguSets:4, etap:1, work:60, rest:30 },
+  { step:4,  L:6,  H:8,  SL:6,  SH:8,  intRounds:10, tguSets:5, etap:1, work:60, rest:30 },
+  // ── ETAP 2: 8/12 ──
+  { step:5,  L:8,  H:12, SL:8,  SH:12, intRounds:4,  tguSets:3, etap:2, work:60, rest:30 },
+  { step:6,  L:8,  H:12, SL:8,  SH:12, intRounds:6,  tguSets:3, etap:2, work:60, rest:30 },
+  { step:7,  L:8,  H:12, SL:8,  SH:12, intRounds:8,  tguSets:4, etap:2, work:60, rest:30 },
+  { step:8,  L:8,  H:12, SL:8,  SH:12, intRounds:10, tguSets:5, etap:2, work:60, rest:30 },
+  // ── ETAP 3: 12/16 — Średniozaawansowany ──
+  { step:9,  L:12, H:16, SL:12, SH:16, intRounds:4,  tguSets:3, etap:3, work:60, rest:30 },
+  { step:10, L:12, H:16, SL:12, SH:16, intRounds:6,  tguSets:3, etap:3, work:60, rest:30 },
+  { step:11, L:12, H:16, SL:12, SH:16, intRounds:8,  tguSets:4, etap:3, work:60, rest:30 },
+  { step:12, L:12, H:16, SL:12, SH:16, intRounds:10, tguSets:5, etap:3, work:60, rest:30 },
+  // ── ETAP 4: 16/20 — Zaawansowany (45s/45s) ──
+  { step:13, L:16, H:20, SL:16, SH:20, intRounds:4, tguSets:3, etap:4, work:45, rest:45 },
+  { step:14, L:16, H:20, SL:16, SH:20, intRounds:5, tguSets:3, etap:4, work:45, rest:45 },
+  { step:15, L:16, H:20, SL:16, SH:20, intRounds:6, tguSets:4, etap:4, work:45, rest:45 },
+  { step:16, L:16, H:20, SL:16, SH:20, intRounds:8, tguSets:5, etap:4, work:45, rest:45 },
+  // ── ETAP 5: 20/24 — Mocno zaawansowany (30s/60s) ──
+  { step:17, L:20, H:24, SL:20, SH:24, intRounds:4, tguSets:3, etap:5, work:30, rest:60 },
+  { step:18, L:20, H:24, SL:20, SH:24, intRounds:4, tguSets:3, etap:5, work:30, rest:60 },
+  { step:19, L:20, H:24, SL:20, SH:24, intRounds:5, tguSets:4, etap:5, work:30, rest:60 },
+  { step:20, L:20, H:24, SL:20, SH:24, intRounds:6, tguSets:5, etap:5, work:30, rest:60 },
+  // ── ETAP 6: 24/32 — Specjalistyczny (30s/90s) ──
+  { step:21, L:24, H:32, SL:24, SH:32, intRounds:3, tguSets:3, etap:6, work:30, rest:90 },
+  { step:22, L:24, H:32, SL:24, SH:32, intRounds:4, tguSets:3, etap:6, work:30, rest:90 },
+  { step:23, L:24, H:32, SL:24, SH:32, intRounds:4, tguSets:4, etap:6, work:30, rest:90 },
+  { step:24, L:24, H:32, SL:24, SH:32, intRounds:5, tguSets:5, etap:6, work:30, rest:90 },
 ];
 
 const WARMUPS = {
@@ -445,34 +463,38 @@ function getMobilityVideo(dayKey) {
 }
 
 const WEEK = [
-  { key:'mon', name:'PN', type:'train', label:'Swing L + TGU H',
+  { key:'mon', name:'PN', type:'train', label:'Swing L + Row L + TGU H',
     exercises:[
-      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min' },
+      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min', note:'Krążenia bioder, barków, kilka przysiadów bez obciążenia' },
       { name:'Swing', fmt:'interval', w:'L', note:'Eksplozja bioder — nie ramion. Plecy neutralne przez cały ruch.' },
-      { name:'Turkish Get-Up', fmt:'tgu', w:'H', note:'Każda faza osobno i świadomie. Wzrok na kettlebell.' },
-      { name:'Cooldown', fmt:'fixed', detail:'5–10 min' },
+      { name:'Bent-Over Row', fmt:'interval', w:'L', note:'Pochyl tułów, plecy neutralne. Ciągnij KB do żebra/biodra. Naprzemiennie ręce co rundę.' },
+      { name:'Turkish Get-Up', fmt:'tgu', w:'H', note:'Każda faza osobno i świadomie. Wzrok na kettlebell. (bez timera)' },
+      { name:'Cooldown', fmt:'fixed', detail:'5–10 min', note:'Tylna taśma + kręgosłup piersiowy + barki' },
     ]},
-  { key:'tue', name:'WT', type:'train', label:'Clean & Press H + Squat L',
+  { key:'tue', name:'WT', type:'train', label:'C&P H + Squat L + Windmill H',
     exercises:[
-      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min' },
-      { name:'Clean & Press', fmt:'interval', w:'H', note:'KB blisko ciała w cleanie — nie biceps curl. Naprzemiennie ręce co rundę.' },
-      { name:'Squat (Goblet)', fmt:'interval', w:'L', squat:true, note:'Pięty na ziemi, pełen zakres. Łokcie wciskają kolana na zewnątrz.' },
-      { name:'Cooldown', fmt:'fixed', detail:'5–10 min' },
+      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min', note:'Krążenia ramion, mobilizacja kostek, kilka swingów BW' },
+      { name:'Clean & Press', fmt:'interval', w:'H', note:'KB blisko ciała w cleanie. Naprzemiennie ręce co rundę.' },
+      { name:'Squat (Goblet)', fmt:'interval', w:'L', note:'Pięty na ziemi, pełen zakres. Łokcie wciskają kolana.', squat:true },
+      { name:'Windmill', fmt:'interval', w:'H', note:'KB nad głową, schylaj się w bok dotykając podłogi. Wzrok na KB. Naprzemiennie ręce co rundę.' },
+      { name:'Cooldown', fmt:'fixed', detail:'5–10 min', note:'Kostki + biodra + barki + szyja' },
     ]},
   { key:'wed', name:'ŚR', type:'rest', label:'ODPOCZYNEK' },
-  { key:'thu', name:'CZ', type:'train', label:'Swing H + TGU L',
+  { key:'thu', name:'CZ', type:'train', label:'Swing H + Row H + TGU L',
     exercises:[
-      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min' },
-      { name:'Swing', fmt:'interval', w:'H', note:'Cięższy kettlebell — mniej powt./rundę. Technika ponad wszystko.' },
-      { name:'Turkish Get-Up', fmt:'tgu', w:'L', note:'Lżejszy ciężar — pracuj nad płynnością przejść między fazami.' },
-      { name:'Cooldown', fmt:'fixed', detail:'5–10 min' },
+      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min', note:'Jak poniedziałek' },
+      { name:'Swing', fmt:'interval', w:'H', note:'Cięższy KB — mniej powt./rundę. Technika ponad wszystko.' },
+      { name:'Bent-Over Row', fmt:'interval', w:'H', note:'Cięższy ciężar — kontrola, nie szarp. Naprzemiennie ręce co rundę.' },
+      { name:'Turkish Get-Up', fmt:'tgu', w:'L', note:'Lżejszy ciężar — pracuj nad płynnością przejść. (bez timera)' },
+      { name:'Cooldown', fmt:'fixed', detail:'5–10 min', note:'Jak poniedziałek' },
     ]},
-  { key:'fri', name:'PT', type:'train', label:'Clean & Press L + Squat H',
+  { key:'fri', name:'PT', type:'train', label:'C&P L + Squat H + Windmill L',
     exercises:[
-      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min' },
-      { name:'Clean & Press', fmt:'interval', w:'L', note:'Lżejszy ciężar — więcej powt./rundę. Skup się na płynności cleana.' },
-      { name:'Squat (Goblet)', fmt:'interval', w:'H', squat:true, note:'Kontrola głębokości pod wyższym ciężarem.' },
-      { name:'Cooldown', fmt:'fixed', detail:'5–10 min' },
+      { name:'Rozgrzewka', fmt:'fixed', detail:'5–10 min', note:'Jak wtorek' },
+      { name:'Clean & Press', fmt:'interval', w:'L', note:'Lżejszy ciężar — więcej powt./rundę. Płynność cleana.' },
+      { name:'Squat (Goblet)', fmt:'interval', w:'H', note:'Kontrola głębokości pod wyższym ciężarem.', squat:true },
+      { name:'Windmill', fmt:'interval', w:'L', note:'Lżejszy ciężar — większa amplituda ruchu. Skup się na rotacji.' },
+      { name:'Cooldown', fmt:'fixed', detail:'5–10 min', note:'Jak wtorek' },
     ]},
   { key:'sat', name:'SB', type:'rest', label:'ODPOCZYNEK' },
   { key:'sun', name:'ND', type:'rest', label:'ODPOCZYNEK' },
@@ -517,11 +539,13 @@ function openOverrideModal(exKey) {
     const isGlobal = st.step === globalStep && curOv === undefined;
     const isOv = st.step === (curOv !== undefined ? curOv+1 : -1);
     const isCur = isGlobal || isOv;
+    const w2 = st.work || 60, r2 = st.rest || 30;
+    const tot2 = Math.round(st.intRounds * (w2 + r2) / 60);
     html += `<div class="step-item ${isCur?'active':''}" onclick="setOverride('${exKey}',${st.step})">
       <div class="step-num">${st.step}</div>
       <div class="step-info">
-        <div class="step-title">Krok ${st.step} — ${st.intRounds} rund, ${st.tguSets} serie TGU</div>
-        <div class="step-detail">~${approxMin(st.intRounds)} min / ćw  ·  L=${st.L}kg / H=${st.H}kg</div>
+        <div class="step-title">Krok ${st.step} — ${st.intRounds} rund · ${w2}s/${r2}s · TGU ${st.tguSets}</div>
+        <div class="step-detail">~${tot2} min / ćw  ·  L=${st.L}kg / H=${st.H}kg</div>
       </div>
       ${isGlobal ? '<span style="color:var(--muted);font-size:10px;font-family:monospace">GLOBALNY</span>' : ''}
       ${isOv ? '<span style="color:var(--accent3);font-size:14px">★</span>' : ''}
@@ -609,11 +633,206 @@ function kg(w, isSquat, exKey) {
 }
 function approxMin(rounds) { return Math.round(rounds*90/60); }
 
+
+
+// ═══════════════════════════════════════════════════════════
+// KB SHOPPING MENTOR
+// ═══════════════════════════════════════════════════════════
+function getShoppingAdvice() {
+  const owned = getOwnedKBs();
+  const cur = curStep();
+  const totalSteps = STEPS.length;
+
+  // Check current step
+  const stepOwned = owned.includes(cur.L) && owned.includes(cur.H) &&
+                    owned.includes(cur.SL) && owned.includes(cur.SH);
+
+  // Check if user is on a "real progression path" — last 2 weeks RPE was good/easy
+  const recentSessions = Object.entries(state.sessions)
+    .filter(([,s]) => s.status === 'done' && s.rpe)
+    .sort((a,b) => b[0].localeCompare(a[0]))
+    .slice(0, 8); // last 8 sessions ≈ 2 weeks
+
+  let easyOrGood = 0, hard = 0;
+  recentSessions.forEach(([,s]) => {
+    Object.values(s.rpe).forEach(v => {
+      if (v === 'easy' || v === 'good') easyOrGood++;
+      if (v === 'hard') hard++;
+    });
+  });
+  const isProgressing = recentSessions.length >= 4 && hard <= 2 && easyOrGood >= recentSessions.length;
+
+  // Find which steps in the next 1-2 etapy are blocked by missing KB
+  const lastStepInEtap = STEPS.filter(s => s.etap === cur.etap).pop();
+  const isLastStep = state.step === lastStepInEtap.step;
+  const isSecondToLast = state.step === lastStepInEtap.step - 1;
+
+  // Find next etap
+  const nextEtap = STEPS.find(s => s.etap === cur.etap + 1);
+  const etapAfterNext = STEPS.find(s => s.etap === cur.etap + 2);
+
+  if (!nextEtap) return null; // already on last etap
+
+  const missingForNext = [];
+  [nextEtap.L, nextEtap.H, nextEtap.SL, nextEtap.SH].forEach(kg => {
+    if (!owned.includes(kg) && !missingForNext.includes(kg)) missingForNext.push(kg);
+  });
+
+  const missingForFurther = [];
+  if (etapAfterNext) {
+    [etapAfterNext.L, etapAfterNext.H, etapAfterNext.SL, etapAfterNext.SH].forEach(kg => {
+      if (!owned.includes(kg) && !missingForFurther.includes(kg) && !missingForNext.includes(kg)) {
+        missingForFurther.push(kg);
+      }
+    });
+  }
+
+  // Determine alert level
+  if (!stepOwned) {
+    return {
+      level: 'critical',
+      msg: `❌ Brakuje Ci KB na aktualny krok. Wróć do poprzedniego kroku lub kup brakujące wagi.`,
+    };
+  }
+
+  if (isLastStep && missingForNext.length > 0) {
+    return {
+      level: 'urgent',
+      msg: `🚨 Skończyłeś bieżący etap. Żeby kontynuować potrzebujesz: ${missingForNext.map(k=>k+'kg').join(', ')}`,
+    };
+  }
+
+  if (isSecondToLast && missingForNext.length > 0 && isProgressing) {
+    return {
+      level: 'soon',
+      msg: `⏰ Zbliżasz się do końca Etapu ${cur.etap}. Twoje tempo jest dobre — czas pomyśleć o zakupie: ${missingForNext.map(k=>k+'kg').join(', ')}`,
+    };
+  }
+
+  if (missingForFurther.length > 0 && cur.etap >= 2) {
+    return {
+      level: 'future',
+      msg: `→ Następny etap masz pokryty. W przyszłości (Etap ${cur.etap + 2}) przyda Ci się: ${missingForFurther.map(k=>k+'kg').join(', ')}`,
+    };
+  }
+
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════
+// HEAVY WEEK & REACTIVE DELOAD
+// ═══════════════════════════════════════════════════════════
+
+// Co 4 tygodnie od pierwszego treningu — Heavy Week
+function getWeekType(weekKey) {
+  // Get first session week
+  const sessions = Object.entries(state.sessions)
+    .filter(([,s]) => s.status === 'done')
+    .sort((a,b) => a[0].localeCompare(b[0]));
+  if (sessions.length === 0) return 'standard';
+
+  const firstDate = new Date(sessions[0][0] + 'T12:00:00');
+  const firstWeek = getISOWeek(firstDate);
+
+  // Calculate week number from start
+  const [fy, fwStr] = firstWeek.split('-W');
+  const [cy, cwStr] = weekKey.split('-W');
+  const fw = parseInt(fwStr), cw = parseInt(cwStr);
+  const weekDiff = (parseInt(cy) - parseInt(fy)) * 52 + (cw - fw);
+
+  // Check for active deload
+  if (state.deloadWeek === weekKey) return 'deload';
+
+  // Heavy Week every 4th week (week 4, 8, 12, ...)
+  if (weekDiff > 0 && (weekDiff + 1) % 4 === 0) return 'heavy';
+
+  return 'standard';
+}
+
+function getCurrentWeekType() {
+  return getWeekType(getISOWeek(new Date()));
+}
+
+// Heavy Week — modifies step parameters
+function applyHeavyWeek(stepData) {
+  // L → use H weight, H → use next KB if owned
+  const owned = getOwnedKBs().sort((a,b)=>a-b);
+  const nextL = stepData.H;
+  const nextH = owned.find(w => w > stepData.H) || stepData.H;
+  const nextSL = stepData.SH;
+  const nextSH = owned.find(w => w > stepData.SH) || stepData.SH;
+  return {
+    ...stepData,
+    L: nextL, H: nextH, SL: nextSL, SH: nextSH,
+    intRounds: Math.max(3, Math.round(stepData.intRounds * 0.6)),
+    tguSets: Math.max(2, Math.round(stepData.tguSets * 0.7)),
+    work: 30,
+    rest: 60,
+    isHeavy: true,
+  };
+}
+
+// Deload — reduce intensity
+function applyDeload(stepData) {
+  return {
+    ...stepData,
+    intRounds: Math.max(3, Math.round(stepData.intRounds * 0.5)),
+    tguSets: Math.max(2, Math.round(stepData.tguSets * 0.5)),
+    isDeload: true,
+  };
+}
+
+// Modified curStep that applies week modifiers
+function effectiveStep() {
+  const base = STEPS[Math.min(state.step, STEPS.length) - 1];
+  const wt = getCurrentWeekType();
+  if (wt === 'heavy') return applyHeavyWeek(base);
+  if (wt === 'deload') return applyDeload(base);
+  return base;
+}
+
+// Track stagnation for reactive deload
+function checkDeloadNeeded() {
+  // 8 weeks without progression OR 2× "stay" suggestions in a row
+  const history = state.suggestionHistory || [];
+  const last2 = history.slice(-2);
+  if (last2.length >= 2 && last2.every(h => h === 'stay')) return 'stay-suggested';
+
+  // 8 weeks at same step
+  const stepHistory = state.stepHistory || [];
+  if (stepHistory.length >= 8) {
+    const last8 = stepHistory.slice(-8);
+    if (last8.every(s => s === state.step)) return 'no-progression';
+  }
+  return null;
+}
+
+function activateDeload() {
+  state.deloadWeek = getISOWeek(new Date());
+  saveState();
+  renderPlan();
+  renderCalendar();
+}
+
+// Track step history weekly
+function recordWeekStep() {
+  const wk = getISOWeek(new Date());
+  if (!state.stepHistory) state.stepHistory = [];
+  if (!state.lastStepRecord || state.lastStepRecord !== wk) {
+    state.stepHistory.push(state.step);
+    state.lastStepRecord = wk;
+    if (state.stepHistory.length > 20) state.stepHistory = state.stepHistory.slice(-20);
+    saveState();
+  }
+}
+
 function getExKey(ex) {
   if (ex.name.includes('Swing')) return 'swing';
   if (ex.name.includes('Squat')) return 'squat';
   if (ex.name.includes('Clean')) return 'cp';
   if (ex.name.includes('Turkish')) return 'tgu';
+  if (ex.name.includes('Row')) return 'row';
+  if (ex.name.includes('Windmill')) return 'windmill';
   return null;
 }
 
@@ -627,6 +846,7 @@ function getExRounds(ex) {
 // PLAN SCREEN
 // ═══════════════════════════════════════════════════════════
 function renderPlan() {
+  recordWeekStep();
   const s = curStep();
   const todayKey = ['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
   const pct = Math.round((state.step / STEPS.length) * 100);
@@ -636,17 +856,43 @@ function renderPlan() {
   const suggested = suggestNextStep();
   const stepOwned = currentStepOwned();
 
+  // Check if reactive deload is recommended
+  const deloadReason = checkDeloadNeeded();
+  const isCurrentlyDeload = getCurrentWeekType() === 'deload';
+  let deloadBanner = '';
+  if (deloadReason && !isCurrentlyDeload) {
+    const reasonText = deloadReason === 'no-progression'
+      ? 'Już 8 tygodni na tym samym kroku'
+      : 'Drugi tydzień z rzędu z sugestią "zostań"';
+    deloadBanner = `<div style="background:rgba(71,255,212,.06);border:2px solid rgba(71,255,212,.3);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">🧘 Sugestia: Tydzień Deload</div>
+      <div style="font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;line-height:1.6;margin-bottom:10px">${reasonText}. Tydzień regeneracji może odblokować dalszy progres.</div>
+      <button class="modal-btn primary" style="margin:0" onclick="activateDeload()">✓ AKTYWUJ DELOAD W TYM TYGODNIU</button>
+    </div>`;
+  }
+
   let html = `
     <div class="screen-title">KB PROTOCOL</div>
     <div class="screen-sub">WILDMAN ATHLETICA METHOD</div>
+    ${deloadBanner}
 
     <div class="kb-manager">
       <div class="kb-manager-title">Moje kettlebell'e</div>
       <div class="kb-grid">
         ${ALL_KBS.map(kg => `<div class="kb-chip ${owned.includes(kg)?'owned':''}" onclick="toggleKB(${kg})">${kg}kg</div>`).join('')}
       </div>
-      ${!stepOwned ? `<div class="kb-suggest">⚠️ Brakuje Ci kettlebelli na aktualny krok (L=${s.L}kg, H=${s.H}kg) — wróć do poprzedniego etapu lub kup brakujące wagi.</div>` : ''}
-      ${suggested ? `<div class="kb-suggest">→ Masz już kettlebell'e na <strong>Etap ${suggested.etap} Krok ${suggested.step}</strong> (L=${suggested.L}kg / H=${suggested.H}kg) — możesz przejść gdy będziesz gotowy.</div>` : ''}
+      ${(() => {
+        const advice = getShoppingAdvice();
+        if (!advice) return '';
+        const colors = {
+          critical: 'rgba(255,107,71,.12);border-color:rgba(255,107,71,.4);color:#ff8c70',
+          urgent: 'rgba(255,107,71,.08);border-color:rgba(255,107,71,.3);color:var(--accent3)',
+          soon: 'rgba(232,255,71,.08);border-color:rgba(232,255,71,.3);color:var(--accent)',
+          future: 'rgba(71,255,212,.06);border-color:rgba(71,255,212,.2);color:var(--accent2)',
+        };
+        return `<div class="kb-suggest" style="background:${colors[advice.level].split(';')[0]};border:1px solid ${colors[advice.level].split(';')[1].replace('border-color:','')};color:${colors[advice.level].split(';')[2].replace('color:','')}">${advice.msg}</div>`;
+      })()}
+      ${suggested ? `<div class="kb-suggest">→ Masz już kettlebell'e na <strong>Etap ${suggested.etap} Krok ${suggested.step}</strong> — możesz przejść gdy będziesz gotowy.</div>` : ''}
     </div>
 
     <div class="prog-banner">
@@ -654,10 +900,16 @@ function renderPlan() {
         <div>
           <div class="prog-step-label">Aktualny krok</div>
           <div class="prog-step-val">ETAP ${s.etap} — KROK ${state.step}</div>
+          ${(() => {
+            const wt = getCurrentWeekType();
+            if (wt === 'heavy') return '<div style="margin-top:6px;padding:4px 8px;background:rgba(255,107,71,.12);border:1px solid rgba(255,107,71,.3);border-radius:5px;display:inline-block;font-family:\'DM Mono\',monospace;font-size:10px;color:var(--accent3);letter-spacing:1px">🔥 HEAVY WEEK</div>';
+            if (wt === 'deload') return '<div style="margin-top:6px;padding:4px 8px;background:rgba(71,255,212,.12);border:1px solid rgba(71,255,212,.3);border-radius:5px;display:inline-block;font-family:\'DM Mono\',monospace;font-size:10px;color:var(--accent2);letter-spacing:1px">🧘 DELOAD</div>';
+            return '';
+          })()}
           <div class="prog-weights">
-            L = ${s.L}kg &nbsp;·&nbsp; H = ${s.H}kg<br>
-            Interwały: ${s.intRounds} rund (~${approxMin(s.intRounds)} min)<br>
-            TGU: ${s.tguSets} serie × 1L+1P
+            L = ${(() => { const e = effectiveStep(); return e.L; })()}kg &nbsp;·&nbsp; H = ${(() => { const e = effectiveStep(); return e.H; })()}kg<br>
+            Interwały: ${(() => { const e = effectiveStep(); const w = e.work||60, r = e.rest||30; return `${e.intRounds} rund · ${w}s/${r}s`; })()}<br>
+            TGU: ${(() => effectiveStep().tguSets)()} serie × 1L+1P
           </div>
         </div>
         <div class="prog-actions">
@@ -722,11 +974,12 @@ function renderPlan() {
       return `${e.name}${ovMark} <span class="badge badge-${e.w}">${e.w}·${kg(e.w,e.squat,key)}kg</span> ${vol}`;
     }).join('<br>');
 
+    const eff = effectiveStep();
     let exRows = '';
     day.exercises.forEach(ex => {
       const exKey = getExKey(ex);
-      const es = exKey ? exStep(exKey) : s;
       const hasOv = exKey && state.overrides[exKey] !== undefined;
+      const es = hasOv ? exStep(exKey) : eff;
       let detail = '';
       if (ex.fmt === 'fixed') {
         const cd = COOLDOWNS[day.key];
@@ -736,7 +989,9 @@ function renderPlan() {
         else detail = ex.detail;
       } else if (ex.fmt === 'interval') {
         const ovNote = hasOv ? ` <span style="color:var(--accent3);font-size:10px">(nadpisano: krok ${state.overrides[exKey]+1})</span>` : '';
-        detail = `${kg(ex.w,ex.squat,exKey)}kg (${ex.w})  ·  ${es.intRounds} rund  ·  60s / 30s  ·  ~${approxMin(es.intRounds)} min${ovNote}`;
+        const w = es.work || 60, r = es.rest || 30;
+        const totalMin = Math.round(es.intRounds * (w + r) / 60);
+        detail = `${kg(ex.w,ex.squat,exKey)}kg (${ex.w})  ·  ${es.intRounds} rund  ·  ${w}s / ${r}s  ·  ~${totalMin} min${ovNote}`;
       } else if (ex.fmt === 'tgu') {
         const ovNote = hasOv ? ` <span style="color:var(--accent3);font-size:10px">(nadpisano: krok ${state.overrides[exKey]+1})</span>` : '';
         detail = `${kg(ex.w,ex.squat,exKey)}kg (${ex.w})  ·  ${es.tguSets} rundy  ·  1L+1P bez przerwy  ·  30s między rundami${ovNote}`;
@@ -849,18 +1104,32 @@ let tLabel = null;
 
 function buildQueue(dayKey) {
   const day = WEEK.find(d=>d.key===dayKey);
-  // Only interval exercises (not TGU — that uses sets, not timer)
+  const eff = effectiveStep();
   return day.exercises
     .filter(e => e.fmt === 'interval')
     .map(e => {
       const key = getExKey(e);
-      const es = key ? exStep(key) : curStep();
+      const es = key && state.overrides[key] !== undefined ? exStep(key) : eff;
+      const w = es.work || 60;
+      const r = es.rest || 30;
       return {
         name: e.name,
         rounds: es.intRounds,
-        sub: `${kg(e.w,e.squat,key)}kg (${e.w})  ·  ${es.intRounds} rund  ·  ${tCfg.work}s / ${tCfg.rest}s`,
+        work: w,
+        rest: r,
+        sub: `${kg(e.w,e.squat,key)}kg (${e.w})  ·  ${es.intRounds} rund  ·  ${w}s / ${r}s${es.isHeavy?' · HEAVY':es.isDeload?' · DELOAD':''}`,
       };
     });
+}
+
+function loadQueueItem(idx) {
+  if (idx >= tQueue.length) return;
+  const ex = tQueue[idx];
+  tCfg.rounds = ex.rounds;
+  if (ex.work) tCfg.work = ex.work;
+  if (ex.rest) tCfg.rest = ex.rest;
+  tLabel = { name: ex.name, sub: ex.sub, idx: idx+1, total: tQueue.length };
+  resetTimer();
 }
 
 function launchTimer(dayKey) {
@@ -868,14 +1137,6 @@ function launchTimer(dayKey) {
   tQueueIdx = 0;
   showScreen('timer');
   loadQueueItem(0);
-}
-
-function loadQueueItem(idx) {
-  if (idx >= tQueue.length) return;
-  const ex = tQueue[idx];
-  tCfg.rounds = ex.rounds;
-  tLabel = { name: ex.name, sub: ex.sub, idx: idx+1, total: tQueue.length };
-  resetTimer();
 }
 
 function updateTimerUI() {
@@ -942,13 +1203,37 @@ function toggleTimer() {
   tSt.running ? pauseTimer() : startTick();
 }
 
+
+let wakeLock = null;
+async function acquireWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    }
+  } catch (e) {}
+}
+async function releaseWakeLock() {
+  if (wakeLock) {
+    try { await wakeLock.release(); } catch(e) {}
+    wakeLock = null;
+  }
+}
+// Re-acquire after tab visibility change
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && tSt && tSt.running) {
+    acquireWakeLock();
+  }
+});
+
 function startTick() {
   tSt.running=true;
+  acquireWakeLock();
   tSt.iv = setInterval(()=>{ tSt.remaining--; if(tSt.remaining<=0) nextPhase(); updateTimerUI(); },1000);
   updateTimerUI();
 }
 
-function pauseTimer() { tSt.running=false; clearInterval(tSt.iv); updateTimerUI(); }
+function pauseTimer() { tSt.running=false; clearInterval(tSt.iv); releaseWakeLock(); updateTimerUI(); }
 
 function resetTimer() {
   pauseTimer();
@@ -963,7 +1248,7 @@ function nextPhase() {
     tSt.phase='rest'; tSt.remaining=tCfg.rest; beep(440,.15);
   } else {
     tSt.round++;
-    if (tSt.round>tCfg.rounds) { pauseTimer(); tSt.finished=true; beep(880,.3); setTimeout(()=>beep(1100,.3),220); return; }
+    if (tSt.round>tCfg.rounds) { pauseTimer(); tSt.finished=true; releaseWakeLock(); beep(880,.3); setTimeout(()=>beep(1100,.3),220); return; }
     tSt.phase='work'; tSt.remaining=tCfg.work; beep(880,.2);
   }
 }
@@ -1162,10 +1447,10 @@ function toggleSession(status) {
 
 // Ćwiczenia per dzień (do ankiety)
 const DAY_EXERCISES = {
-  mon: ['Swing','Turkish Get-Up'],
-  tue: ['Clean & Press','Squat'],
-  thu: ['Swing','Turkish Get-Up'],
-  fri: ['Clean & Press','Squat'],
+  mon: ['Swing','Bent-Over Row','Turkish Get-Up'],
+  tue: ['Clean & Press','Squat (Goblet)','Windmill'],
+  thu: ['Swing','Bent-Over Row','Turkish Get-Up'],
+  fri: ['Clean & Press','Squat (Goblet)','Windmill'],
 };
 
 // RPE values: 'easy' | 'good' | 'hard'
@@ -1258,39 +1543,89 @@ function analyzeSuggestion() {
   const { ratings, perEx, total } = getWeekRPEs();
   if (total === 0) return null;
 
-  const easy = ratings.filter(r => r === 'easy').length;
-  const good = ratings.filter(r => r === 'good').length;
-  const hard = ratings.filter(r => r === 'hard').length;
+  // Per-track analysis: each exercise+weight combo separately
+  const trackRatings = {};
+  Object.entries(state.sessions).forEach(([ds, s]) => {
+    if (!s.rpe || s.status !== 'done') return;
+    const d = new Date(ds + 'T12:00:00');
+    if (getISOWeek(d) !== getISOWeek(new Date())) return;
+    const day = WEEK.find(w => w.key === s.dayKey);
+    if (!day) return;
+    Object.entries(s.rpe).forEach(([exName, val]) => {
+      if (!val) return;
+      const ex = day.exercises.find(e => e.name === exName);
+      if (!ex || !ex.w) return;
+      const trackKey = `${exName}-${ex.w}`;
+      if (!trackRatings[trackKey]) trackRatings[trackKey] = [];
+      trackRatings[trackKey].push(val);
+    });
+  });
 
+  // Decide per track
+  const tooEasy = [], tooHard = [], justRight = [];
+  Object.entries(trackRatings).forEach(([track, vals]) => {
+    const e = vals.filter(v=>v==='easy').length;
+    const h = vals.filter(v=>v==='hard').length;
+    if (e >= 2 && h === 0) tooEasy.push(track);
+    else if (h >= 2 && e === 0) tooHard.push(track);
+    else justRight.push(track);
+  });
+
+  // Aggregate decision
   let action, title, detail, cls;
+  const totalTracks = tooEasy.length + tooHard.length + justRight.length;
 
-  if (hard >= 2) {
+  if (totalTracks === 0) {
+    action = 'stay';
+    title = '⏳ POTRZEBA WIĘCEJ DANYCH';
+    cls = 'sug-stay';
+    detail = `Wykonaj jeszcze kilka treningów z oceną żeby uzyskać sugestię.`;
+  } else if (tooHard.length >= Math.ceil(totalTracks * 0.4)) {
     action = 'down';
     title = '↓ ROZWAŻ COFNIĘCIE KROKU';
     cls = 'sug-down';
-    detail = `${hard} z ${total} ćwiczeń było za ciężkich. Twoje ciało sygnalizuje że potrzebuje więcej czasu na adaptację. Zostań na tym kroku jeszcze tydzień lub cofnij się o jeden krok.`;
-  } else if (easy >= 3) {
+    detail = `${tooHard.length} z ${totalTracks} kombinacji ćwiczenie+ciężar było za ciężkich. Cofnij krok globalnie lub tylko dla wybranych ćwiczeń.`;
+  } else if (tooEasy.length >= Math.ceil(totalTracks * 0.5)) {
     action = 'up';
     title = '↑ CZAS NA PROGRESJĘ';
     cls = 'sug-up';
-    detail = `${easy} z ${total} ćwiczeń było za lekkich. Twoje ciało jest gotowe na więcej. Możesz przejść do następnego kroku.`;
+    detail = `${tooEasy.length} z ${totalTracks} kombinacji było za lekkich. Możesz przejść do następnego kroku globalnie, lub tylko dla wybranych ćwiczeń.`;
+  } else if (tooEasy.length > 0 && tooHard.length > 0) {
+    action = 'mixed';
+    title = '⇅ MIESZANE — NADPISZ POJEDYNCZE ĆWICZENIA';
+    cls = 'sug-stay';
+    detail = `Niektóre ćwiczenia są gotowe na więcej, inne potrzebują więcej czasu. Użyj funkcji "Ustaw krok" przy konkretnych ćwiczeniach na stronie PLAN.`;
   } else {
     action = 'stay';
     title = '✓ JESTEŚ W IDEALNYM MIEJSCU';
     cls = 'sug-stay';
-    detail = `${good} z ${total} ćwiczeń było w sam raz${easy > 0 ? `, ${easy} za lekkich` : ''}${hard > 0 ? `, ${hard} za ciężkich` : ''}. Kontynuuj aktualny krok — progres idzie dobrze.`;
+    detail = `${justRight.length} z ${totalTracks} kombinacji w sam raz. Kontynuuj aktualny krok.`;
   }
 
-  // Per-exercise breakdown
-  const breakdown = Object.entries(perEx).map(([ex, vals]) => {
+  // Per-track breakdown
+  const breakdown = Object.entries(trackRatings).map(([track, vals]) => {
     const e = vals.filter(v=>v==='easy').length;
-    const g = vals.filter(v=>v==='good').length;
     const h = vals.filter(v=>v==='hard').length;
-    const emoji = h > 0 ? '🔥' : e === vals.length ? '😊' : '💪';
-    return `${emoji} ${ex}: ${vals.map(v=>v==='easy'?'lekko':v==='good'?'ok':'ciężko').join(', ')}`;
+    let emoji, status;
+    if (e >= 2 && h === 0) { emoji = '😊'; status = 'za lekko'; }
+    else if (h >= 2 && e === 0) { emoji = '🔥'; status = 'za ciężko'; }
+    else { emoji = '💪'; status = 'ok'; }
+    return `${emoji} ${track.replace('-L',' (L)').replace('-H',' (H)')}: ${status}`;
   }).join('<br>');
 
-  return { action, title, detail, cls, breakdown, easy, good, hard, total };
+  // Track stay/mixed in history for deload detection
+  if (action === 'stay' || action === 'mixed') {
+    if (!state.suggestionHistory) state.suggestionHistory = [];
+    const wk = getISOWeek(new Date());
+    if (state.lastSuggestionWeek !== wk) {
+      state.suggestionHistory.push('stay');
+      state.lastSuggestionWeek = wk;
+      if (state.suggestionHistory.length > 10) state.suggestionHistory = state.suggestionHistory.slice(-10);
+      saveState();
+    }
+  }
+
+  return { action, title, detail, cls, breakdown, total: totalTracks, tooEasy, tooHard };
 }
 
 function showWeeklySuggestion() {
@@ -1340,9 +1675,9 @@ function getSuggestionBanner() {
 // ═══════════════════════════════════════════════════════════
 let activeChartEx = 'swing';
 
-const EX_COLORS = { swing:'#e8ff47', squat:'#47ffd4', cp:'#ff6b47', tgu:'#a78bfa' };
-const EX_LABELS_CHART = { swing:'Swing', squat:'Squat', cp:'Clean & Press', tgu:'TGU' };
-const EX_DAYS = { swing:['mon','thu'], tgu:['mon','thu'], cp:['tue','fri'], squat:['tue','fri'] };
+const EX_COLORS = { swing:'#e8ff47', squat:'#47ffd4', cp:'#ff6b47', tgu:'#a78bfa', row:'#5b9eff', windmill:'#ff8ed4' };
+const EX_LABELS_CHART = { swing:'Swing', squat:'Squat', cp:'Clean & Press', tgu:'TGU', row:'Row', windmill:'Windmill' };
+const EX_DAYS = { swing:['mon','thu'], tgu:['mon','thu'], cp:['tue','fri'], squat:['tue','fri'], row:['mon','thu'], windmill:['tue','fri'] };
 const COLOR_ENDURANCE = '#888';
 
 function getChartData(exKey, type) {
