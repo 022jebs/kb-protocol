@@ -538,7 +538,6 @@ const WEEK = [
       { name:'Clean & Press',  fmt:'interval', w:'H', bilateral:false, note:'KB blisko ciała w cleanie. Naprzemiennie ręce.' },
       { name:'Squat (Goblet)', fmt:'interval', w:'L', bilateral:true,  squat:true, note:'Pięty na ziemi, pełen zakres. Łokcie wciskają kolana.' },
       { name:'Windmill',       fmt:'interval', w:'H', bilateral:false, note:'KB nad głową, schylaj się w bok. Wzrok na KB. Naprzemiennie.' },
-      { name:'Turkish Get-Up', fmt:'tgu',      w:'H', bilateral:false, note:'Każda faza osobno. (bez timera)' },
       { name:'Cooldown',       fmt:'fixed',    note:'Kostki + biodra + barki + szyja' },
     ]},
   { key:'wed', name:'ŚR', type:'rest', label:'ODPOCZYNEK' },
@@ -556,7 +555,6 @@ const WEEK = [
       { name:'Clean & Press',  fmt:'interval', w:'L', bilateral:false, note:'Lżejszy ciężar — więcej powt./rundę. Płynność cleana.' },
       { name:'Squat (Goblet)', fmt:'interval', w:'H', bilateral:true,  squat:true, note:'Kontrola głębokości pod wyższym ciężarem.' },
       { name:'Windmill',       fmt:'interval', w:'L', bilateral:false, note:'Lżejszy — większa amplituda. Skup się na rotacji.' },
-      { name:'Turkish Get-Up', fmt:'tgu',      w:'L', bilateral:false, note:'Jak wtorek. (bez timera)' },
       { name:'Cooldown',       fmt:'fixed',    note:'Jak wtorek' },
     ]},
   { key:'sat', name:'SB', type:'rest', label:'ODPOCZYNEK' },
@@ -592,6 +590,26 @@ function loadState() {
 }
 function saveState() { localStorage.setItem('kb2_state', JSON.stringify(state)); }
 let state = loadState();
+
+// Migrate XP — calculate XP for existing sessions that predate XP system
+(function migrateXP() {
+  const doneSessions = Object.values(state.sessions).filter(s => s.status === 'done');
+  if (doneSessions.length === 0) return;
+  // If XP seems too low for number of sessions, recalculate
+  const minExpectedXP = doneSessions.length * 25; // minimum at Etap 1 rate
+  if (state.xp < minExpectedXP) {
+    let totalXP = 0;
+    doneSessions.forEach(s => {
+      const step = s.snapshot ? STEPS.find(st => st.step === s.snapshot.swing?.step) : null;
+      const etap = step ? step.etap : 1;
+      totalXP += XP_PER_TRAINING[etap] || 25;
+    });
+    if (totalXP > state.xp) {
+      state.xp = totalXP;
+      saveState();
+    }
+  }
+})();
 
 // ═══════════════════════════════════════════════════════════
 // UTILS
